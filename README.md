@@ -2,11 +2,11 @@
 
 ## Build atual
 
-- versão: `1.0.2`
-- build local: `$BUILD_LOCAL`
-- build UTC: `$BUILD_TS`
-- conclusão desta entrega: `92%`
-- correção crítica incluída: `camada modal hidden agora não bloqueia mais os cliques`
+- versão: `1.1.0`
+- build local: `09/03/2026 20:56:42`
+- build UTC: `2026-03-09 20:56:42 UTC`
+- conclusão desta entrega: `96%`
+- correções e melhorias incluídas: `modal corrigido, jogabilidade refinada, mapa redesenhado e aeronaves retrabalhadas`
 
 SkyFlow Control é um jogo web mobile-first em HTML, CSS e JavaScript puro que simula controle de tráfego aéreo com mapa mundial estilizado, aeroportos reais, progressão de carreira, conteúdo modular e painel Admin local.
 

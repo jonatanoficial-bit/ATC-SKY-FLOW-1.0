@@ -62,6 +62,7 @@ const state = {
   lastFrame: 0
 };
 
+const recentToasts = new Map();
 
 const applyBuildInfo = async () => {
   try {
@@ -75,6 +76,12 @@ const applyBuildInfo = async () => {
 };
 
 const showToast = (message, type = 'info') => {
+  const toastKey = `${type}:${message}`;
+  const now = Date.now();
+  if ((recentToasts.get(toastKey) || 0) > now - 1800) return;
+  recentToasts.set(toastKey, now);
+  const queue = [...refs.toastLayer.children];
+  if (queue.length >= 4) queue[0].remove();
   const toast = document.createElement('article');
   toast.className = `toast ${type === 'warning' ? 'warning' : type === 'danger' ? 'danger' : ''}`;
   toast.textContent = message;
@@ -82,8 +89,8 @@ const showToast = (message, type = 'info') => {
   window.setTimeout(() => {
     toast.style.opacity = '0';
     toast.style.transform = 'translateY(12px)';
-  }, 2400);
-  window.setTimeout(() => toast.remove(), 3200);
+  }, 2200);
+  window.setTimeout(() => toast.remove(), 3000);
 };
 
 const switchScreen = (screenId) => {
@@ -164,7 +171,7 @@ const renderSelectedFlight = (snapshot) => {
   refs.selectedFlightCard.innerHTML = `
     <h4>${flight.originId} → ${flight.destinationId}</h4>
     <div class="selected-grid">
-      <div><span class="stat-label">Altitude</span><strong>FL ${flight.targetAltitude}</strong></div>
+      <div><span class="stat-label">Altitude</span><strong>FL ${Math.round(flight.altitude || flight.targetAltitude)}</strong></div>
       <div><span class="stat-label">Velocidade</span><strong>${flight.speed.toFixed(2)}x</strong></div>
       <div><span class="stat-label">ETA</span><strong>${eta}s</strong></div>
       <div><span class="stat-label">Estado</span><strong>${flight.priority ? 'Prioridade' : flight.holdTimer > 0 ? 'Holding' : 'Em rota'}</strong></div>
@@ -177,7 +184,7 @@ const renderFlightStrips = (snapshot) => {
   refs.flightStripList.innerHTML = flights.map((flight) => `
     <button class="flight-strip ${snapshot?.selectedFlight?.id === flight.id ? 'is-selected' : ''}" type="button" data-flight-select="${flight.id}">
       <h4>${flight.callsign}</h4>
-      <div class="flight-strip-meta"><span>${flight.originId} → ${flight.destinationId}</span><span>FL ${flight.targetAltitude}</span><span>${Math.round(flight.progress * 100)}%</span></div>
+      <div class="flight-strip-meta"><span>${flight.originId} → ${flight.destinationId}</span><span>FL ${Math.round(flight.altitude || flight.targetAltitude)}</span><span>${Math.round(flight.progress * 100)}%</span></div>
     </button>
   `).join('') || '<article class="flight-strip"><h4>Nenhum voo ativo</h4><p class="supporting-text">Inicie uma janela para carregar o tráfego.</p></article>';
 };

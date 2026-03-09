@@ -1,0 +1,65 @@
+[
+  {
+    "id": "SFO-HNL",
+    "from": "SFO",
+    "to": "HNL",
+    "demand": 6,
+    "bidirectional": true
+  },
+  {
+    "id": "HNL-AKL",
+    "from": "HNL",
+    "to": "AKL",
+    "demand": 5,
+    "bidirectional": true
+  },
+  {
+    "id": "SFO-ICN",
+    "from": "SFO",
+    "to": "ICN",
+    "demand": 7,
+    "bidirectional": true
+  },
+  {
+    "id": "NRT-SYD",
+    "from": "NRT",
+    "to": "SYD",
+    "demand": 6,
+    "bidirectional": true
+  },
+  {
+    "id": "AKL-SYD",
+    "from": "AKL",
+    "to": "SYD",
+    "demand": 6,
+    "bidirectional": true
+  },
+  {
+    "id": "SIN-AKL",
+    "from": "SIN",
+    "to": "AKL",
+    "demand": 5,
+    "bidirectional": true
+  },
+  {
+    "id": "ICN-HND",
+    "from": "ICN",
+    "to": "HND",
+    "demand": 5,
+    "bidirectional": true
+  },
+  {
+    "id": "PPT-LAX",
+    "from": "PPT",
+    "to": "LAX",
+    "demand": 3,
+    "bidirectional": true
+  },
+  {
+    "id": "PPT-AKL",
+    "from": "PPT",
+    "to": "AKL",
+    "demand": 3,
+    "bidirectional": true
+  }
+]

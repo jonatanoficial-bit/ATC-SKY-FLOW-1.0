@@ -1,0 +1,80 @@
+[
+  {
+    "id": "core_atlantic_window",
+    "packageId": "core",
+    "title": "Janela Atlântica",
+    "rankRequired": "cadet",
+    "difficulty": "Cadete",
+    "blurb": "Segure o fluxo entre América do Sul, América do Norte e Europa sem perder estabilidade.",
+    "spawnInterval": 6.6,
+    "maxActive": 6,
+    "targetScore": 820,
+    "duration": 180,
+    "conflictRadius": 0.054,
+    "preferredAirports": [
+      "GRU",
+      "JFK",
+      "LHR",
+      "MAD",
+      "BOG",
+      "GIG"
+    ],
+    "weatherCells": [
+      {
+        "id": "atlantic_front",
+        "lat": 11,
+        "lon": -29,
+        "radius": 0.048,
+        "label": "Frente Atlântica",
+        "severity": 0.7
+      },
+      {
+        "id": "med_crosswind",
+        "lat": 38,
+        "lon": 2,
+        "radius": 0.03,
+        "label": "Ventos Ibéricos",
+        "severity": 0.4
+      }
+    ]
+  },
+  {
+    "id": "core_desert_bridge",
+    "packageId": "core",
+    "title": "Ponte do Deserto",
+    "rankRequired": "controller",
+    "difficulty": "Oficial",
+    "blurb": "Administre o corredor entre Europa, Golfo e Ásia sob alta pressão operacional.",
+    "spawnInterval": 5.3,
+    "maxActive": 7,
+    "targetScore": 1180,
+    "duration": 195,
+    "conflictRadius": 0.057,
+    "preferredAirports": [
+      "LHR",
+      "FRA",
+      "CDG",
+      "DXB",
+      "DEL",
+      "SIN"
+    ],
+    "weatherCells": [
+      {
+        "id": "gulf_heat",
+        "lat": 25,
+        "lon": 48,
+        "radius": 0.036,
+        "label": "Calor Convectivo",
+        "severity": 0.65
+      },
+      {
+        "id": "indian_jet",
+        "lat": 19,
+        "lon": 69,
+        "radius": 0.04,
+        "label": "Jet do Índico",
+        "severity": 0.55
+      }
+    ]
+  }
+]

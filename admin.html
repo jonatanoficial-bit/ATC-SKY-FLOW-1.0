@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#08111f" />
+    <title>SkyFlow Control — Admin</title>
+    <link rel="icon" type="image/svg+xml" href="./assets/branding/favicon.svg" />
+    <link rel="stylesheet" href="./css/tokens.css" />
+    <link rel="stylesheet" href="./css/styles.css" />
+    <link rel="stylesheet" href="./css/admin.css" />
+  </head>
+  <body class="admin-body">
+    <div class="app-shell admin-shell">
+      <div class="ambient ambient-a"></div>
+      <div class="ambient ambient-b"></div>
+
+      <header class="topbar glass-panel">
+        <div class="brand-block">
+          <img class="brand-logo" src="./assets/branding/logo.svg" alt="SkyFlow Control" />
+          <div>
+            <p class="eyebrow">Painel local</p>
+            <h1>Admin de conteúdo</h1>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <a class="chrome-button chrome-link" href="./index.html">Voltar ao jogo</a>
+          <button class="chrome-button" id="logoutButton" type="button" hidden>Sair</button>
+        </div>
+      </header>
+
+      <main class="admin-main">
+        <section class="glass-panel auth-panel" id="loginPanel">
+          <p class="eyebrow">Acesso local</p>
+          <h2>Entrar no Admin</h2>
+          <p class="supporting-text">Estrutura pronta para evoluir depois para backend, mas já funcional via armazenamento local.</p>
+
+          <form id="loginForm" class="stack-form">
+            <label>
+              <span>Usuário</span>
+              <input name="username" type="text" placeholder="admin" required />
+            </label>
+            <label>
+              <span>Senha</span>
+              <input name="password" type="password" placeholder="tower123" required />
+            </label>
+            <button class="primary-button" type="submit">Entrar</button>
+          </form>
+
+          <div class="credential-hint">Padrão inicial: <strong>admin</strong> / <strong>tower123</strong></div>
+        </section>
+
+        <section id="adminPanel" class="admin-workspace" hidden>
+          <aside class="glass-panel admin-sidebar">
+            <div class="section-head compact">
+              <div>
+                <p class="eyebrow">Resumo</p>
+                <h2>Console</h2>
+              </div>
+            </div>
+
+            <div class="admin-stats" id="adminStats"></div>
+
+            <div class="sidebar-actions">
+              <button class="secondary-button" id="exportStateButton" type="button">Exportar estado</button>
+              <label class="secondary-button file-button">
+                Importar estado
+                <input id="importStateInput" type="file" accept=".json,application/json" hidden />
+              </label>
+              <button class="secondary-button" id="loadTemplateButton" type="button">Carregar template</button>
+            </div>
+
+            <section class="credential-card">
+              <h3>Credenciais locais</h3>
+              <form id="credentialForm" class="stack-form compact-form">
+                <label>
+                  <span>Novo usuário</span>
+                  <input name="username" type="text" required />
+                </label>
+                <label>
+                  <span>Nova senha</span>
+                  <input name="password" type="password" required />
+                </label>
+                <button class="secondary-button" type="submit">Salvar credenciais</button>
+              </form>
+            </section>
+          </aside>
+
+          <section class="admin-content">
+            <div class="glass-panel section-block">
+              <div class="section-head">
+                <div>
+                  <p class="eyebrow">Pacotes</p>
+                  <h2>Built-in + custom</h2>
+                </div>
+              </div>
+              <div id="adminPackageGrid" class="package-grid admin-package-grid"></div>
+            </div>
+
+            <div class="glass-panel section-block">
+              <div class="section-head">
+                <div>
+                  <p class="eyebrow">Editor modular</p>
+                  <h2 id="editorTitle">Novo pacote</h2>
+                </div>
+                <span class="tiny-pill" id="editorTag">JSON validado no save</span>
+              </div>
+
+              <form id="packageForm" class="editor-form">
+                <div class="editor-meta-grid">
+                  <label><span>ID</span><input name="id" type="text" placeholder="custom_pacific_lane" required /></label>
+                  <label><span>Título</span><input name="title" type="text" placeholder="Pacific Lane" required /></label>
+                  <label><span>Subtítulo</span><input name="subtitle" type="text" placeholder="Expansão personalizada" /></label>
+                  <label><span>Versão</span><input name="version" type="text" value="1.0.0" /></label>
+                  <label>
+                    <span>Rank de unlock</span>
+                    <select name="unlockRank">
+                      <option value="cadet">Cadete</option>
+                      <option value="controller">Oficial</option>
+                      <option value="director">Diretor</option>
+                      <option value="chief">Chief</option>
+                    </select>
+                  </label>
+                  <label><span>Cor Accent</span><input name="accent" type="color" value="#72f6d5" /></label>
+                  <label><span>Cor Glow</span><input name="glow" type="color" value="#6da9ff" /></label>
+                  <label class="file-label">
+                    <span>Cover image opcional</span>
+                    <input id="coverImageInput" type="file" accept="image/*" />
+                  </label>
+                </div>
+
+                <label><span>Descrição</span><textarea name="description" rows="3" placeholder="Descrição operacional do pacote."></textarea></label>
+
+                <div class="editor-json-grid">
+                  <label>
+                    <span>Aeroportos (JSON array)</span>
+                    <textarea name="airports" rows="10"></textarea>
+                  </label>
+                  <label>
+                    <span>Rotas (JSON array)</span>
+                    <textarea name="routes" rows="10"></textarea>
+                  </label>
+                  <label>
+                    <span>Cenários (JSON array)</span>
+                    <textarea name="scenarios" rows="10"></textarea>
+                  </label>
+                </div>
+
+                <div class="hero-actions admin-form-actions">
+                  <button class="primary-button" type="submit">Salvar pacote</button>
+                  <button class="secondary-button" id="clearEditorButton" type="button">Limpar editor</button>
+                  <label class="secondary-button file-button">
+                    Importar pacote JSON
+                    <input id="importPackageInput" type="file" accept=".json,application/json" hidden />
+                  </label>
+                </div>
+              </form>
+            </div>
+
+            <div class="glass-panel section-block">
+              <div class="section-head">
+                <div>
+                  <p class="eyebrow">Configuração global</p>
+                  <h2>Ruleset local</h2>
+                </div>
+              </div>
+
+              <form id="configForm" class="config-grid">
+                <label><span>Piloto padrão</span><input name="defaultPilotName" type="text" /></label>
+                <label><span>Starter credits</span><input name="starterCredits" type="number" min="0" step="50" /></label>
+                <label><span>Spawn base</span><input name="baseSpawnInterval" type="number" min="2" step="0.1" /></label>
+                <label><span>Raio de conflito</span><input name="baseConflictRadius" type="number" min="0.03" max="0.2" step="0.001" /></label>
+                <label><span>Duração padrão</span><input name="sessionDuration" type="number" min="60" step="5" /></label>
+                <label><span>Pontos por pouso</span><input name="scorePerLanding" type="number" min="50" step="5" /></label>
+                <button class="primary-button" type="submit">Salvar config</button>
+              </form>
+            </div>
+          </section>
+        </section>
+      </main>
+
+      <div id="adminToastLayer" class="toast-layer"></div>
+    </div>
+
+    <script type="module" src="./js/admin/admin.js"></script>
+  </body>
+</html>

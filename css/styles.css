@@ -1,0 +1,908 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: dark;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--font-sans);
+  background:
+    radial-gradient(circle at top left, rgba(114, 246, 213, 0.12), transparent 24%),
+    radial-gradient(circle at 80% 10%, rgba(109, 169, 255, 0.16), transparent 28%),
+    linear-gradient(180deg, var(--bg-1) 0%, var(--bg-0) 100%);
+  color: var(--text-primary);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.app-shell {
+  position: relative;
+  min-height: 100vh;
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: calc(env(safe-area-inset-top, 0px) + 1rem) 1rem calc(env(safe-area-inset-bottom, 0px) + 6rem);
+  overflow: hidden;
+}
+
+.ambient {
+  position: fixed;
+  inset: auto;
+  width: 18rem;
+  height: 18rem;
+  border-radius: 999px;
+  filter: blur(60px);
+  opacity: 0.5;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.ambient-a {
+  top: -5rem;
+  right: -5rem;
+  background: rgba(109, 169, 255, 0.22);
+}
+
+.ambient-b {
+  bottom: 0;
+  left: -6rem;
+  background: rgba(114, 246, 213, 0.18);
+}
+
+.topbar,
+.main-grid,
+.bottom-nav,
+.toast-layer,
+.modal-layer {
+  position: relative;
+  z-index: 1;
+}
+
+.glass-panel,
+.glass-strip {
+  background: linear-gradient(180deg, rgba(19, 33, 59, 0.82), rgba(10, 18, 33, 0.78));
+  border: 1px solid var(--line-soft);
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(var(--blur-strong));
+  -webkit-backdrop-filter: blur(var(--blur-strong));
+}
+
+.glass-strip {
+  border-radius: 999px;
+  padding: 0.55rem 0.85rem;
+}
+
+.topbar {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.1rem;
+  border-radius: var(--radius-lg);
+  margin-bottom: 1rem;
+}
+
+.brand-block {
+  display: flex;
+  gap: 0.9rem;
+  align-items: center;
+  min-width: 0;
+}
+
+.brand-logo {
+  width: 3.4rem;
+  height: 3.4rem;
+  flex: 0 0 auto;
+  border-radius: 1rem;
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.1), 0 20px 40px rgba(18, 38, 72, 0.4);
+}
+
+.brand-block h1,
+.section-head h2,
+.section-head h3,
+.hero-copy h2 {
+  margin: 0;
+  letter-spacing: -0.03em;
+}
+
+.hero-copy h2 {
+  font-size: clamp(1.7rem, 4.4vw, 3.1rem);
+  line-height: 1.02;
+  max-width: 18ch;
+}
+
+.eyebrow {
+  margin: 0 0 0.35rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.supporting-text,
+.hero-text {
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.topbar-actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.rank-pill,
+.tiny-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 2.4rem;
+  padding: 0.55rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid rgba(114, 246, 213, 0.16);
+  background: rgba(10, 21, 37, 0.6);
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.tiny-pill {
+  min-height: 2rem;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+.chrome-button,
+.primary-button,
+.secondary-button,
+.command-button,
+.nav-chip {
+  position: relative;
+  border: 1px solid transparent;
+  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease, background 160ms ease;
+  will-change: transform;
+}
+
+.chrome-button:hover,
+.primary-button:hover,
+.secondary-button:hover,
+.command-button:hover,
+.nav-chip:hover {
+  transform: translateY(-1px);
+}
+
+.chrome-button:active,
+.primary-button:active,
+.secondary-button:active,
+.command-button:active,
+.nav-chip:active {
+  transform: translateY(1px) scale(0.995);
+}
+
+.chrome-button {
+  min-height: 2.6rem;
+  padding: 0.7rem 1rem;
+  border-radius: 999px;
+  background: rgba(8, 15, 28, 0.72);
+  border-color: var(--line-soft);
+  color: var(--text-primary);
+}
+
+.chrome-button[disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.primary-button,
+.secondary-button {
+  min-height: 3rem;
+  padding: 0.85rem 1.2rem;
+  border-radius: 1rem;
+  font-weight: 700;
+}
+
+.primary-button {
+  background: linear-gradient(135deg, rgba(114, 246, 213, 0.94), rgba(109, 169, 255, 0.92));
+  color: #04101b;
+  box-shadow: 0 14px 34px rgba(83, 179, 255, 0.24);
+}
+
+.secondary-button {
+  background: rgba(9, 18, 34, 0.76);
+  border-color: var(--line-soft);
+  color: var(--text-primary);
+}
+
+.main-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.screen {
+  display: none;
+  gap: 1rem;
+}
+
+.screen.active {
+  display: grid;
+}
+
+.hero-card {
+  display: grid;
+  gap: 1rem;
+  padding: 1.2rem;
+  border-radius: var(--radius-lg);
+}
+
+.hero-side,
+.stats-grid,
+.mission-grid,
+.package-grid,
+.preferences-grid,
+.ops-grid,
+.hud-metrics,
+.hero-actions,
+.admin-stats,
+.config-grid {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.hero-side {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.hero-stat-card,
+.metric-card,
+.stat-surface,
+.toggle-card {
+  position: relative;
+  padding: 1rem;
+  border-radius: 1.2rem;
+  background: linear-gradient(180deg, rgba(15, 28, 50, 0.86), rgba(9, 17, 31, 0.82));
+  border: 1px solid var(--line-soft);
+  overflow: hidden;
+}
+
+.hero-stat-card::before,
+.metric-card::before,
+.stat-surface::before,
+.toggle-card::before,
+.package-card::before,
+.flight-strip::before,
+.selected-flight-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.08), transparent 36%);
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.hero-stat-card strong,
+.metric-card strong,
+.stat-surface strong {
+  display: block;
+  margin-top: 0.4rem;
+  font-size: clamp(1.25rem, 4vw, 1.9rem);
+}
+
+.stat-label {
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+}
+
+.stats-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.stat-surface small {
+  display: block;
+  margin-top: 0.25rem;
+  color: var(--text-muted);
+}
+
+.section-block {
+  padding: 1.1rem;
+  border-radius: var(--radius-lg);
+}
+
+.section-head {
+  display: flex;
+  gap: 0.75rem;
+  align-items: start;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.section-head.compact {
+  margin-bottom: 0.8rem;
+}
+
+.mission-grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.mission-card,
+.package-card,
+.flight-strip {
+  position: relative;
+  padding: 1rem;
+  border-radius: 1.35rem;
+  background: linear-gradient(180deg, rgba(12, 22, 42, 0.85), rgba(7, 14, 28, 0.88));
+  border: 1px solid var(--line-soft);
+  overflow: hidden;
+}
+
+.mission-card.is-selected,
+.package-card.is-active,
+.flight-strip.is-selected {
+  border-color: rgba(114, 246, 213, 0.42);
+  box-shadow: 0 18px 40px rgba(84, 198, 255, 0.14);
+}
+
+.mission-card h4,
+.package-card h4,
+.flight-strip h4,
+.selected-flight-card h4 {
+  margin: 0 0 0.4rem;
+  font-size: 1.05rem;
+}
+
+.meta-row,
+.flight-strip-meta,
+.package-meta {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.75rem;
+}
+
+.meta-row span,
+.flight-strip-meta span,
+.package-meta span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.9rem;
+  padding: 0.3rem 0.65rem;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.06);
+  color: var(--text-secondary);
+  font-size: 0.76rem;
+}
+
+.game-hud {
+  display: grid;
+  gap: 0.9rem;
+  padding: 1rem 1.1rem;
+  border-radius: var(--radius-lg);
+}
+
+.hud-metrics {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.world-stage {
+  position: relative;
+  min-height: min(72vh, 35rem);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+}
+
+.world-stage canvas,
+.marker-layer {
+  position: absolute;
+  inset: 0;
+}
+
+.marker-layer {
+  pointer-events: none;
+}
+
+.marker-layer > * {
+  pointer-events: auto;
+}
+
+.world-legend {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  display: flex;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+  color: var(--text-secondary);
+  font-size: 0.76rem;
+}
+
+.legend-dot {
+  display: inline-flex;
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 999px;
+  margin-right: 0.35rem;
+}
+
+.dot-green { background: var(--success); }
+.dot-gold { background: var(--gold); }
+.dot-red { background: var(--danger); }
+
+.ops-grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.flight-strip-panel,
+.command-dock {
+  padding: 1rem;
+  border-radius: var(--radius-lg);
+}
+
+.flight-strip-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.flight-strip {
+  cursor: pointer;
+  transition: border-color 160ms ease, transform 160ms ease;
+}
+
+.flight-strip:hover {
+  transform: translateY(-1px);
+}
+
+.selected-flight-card {
+  position: relative;
+  min-height: 9rem;
+  padding: 1rem;
+  border-radius: 1.35rem;
+  border: 1px solid var(--line-soft);
+  background: linear-gradient(180deg, rgba(13, 23, 43, 0.94), rgba(7, 14, 28, 0.82));
+  color: var(--text-secondary);
+}
+
+.selected-grid {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.selected-grid strong {
+  display: block;
+  font-size: 1rem;
+}
+
+.command-grid {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 1rem;
+}
+
+.command-button {
+  min-height: 3.2rem;
+  border-radius: 1rem;
+  background: linear-gradient(180deg, rgba(16, 32, 58, 0.94), rgba(10, 18, 32, 0.95));
+  border: 1px solid rgba(255,255,255,0.08);
+  color: var(--text-primary);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.command-button.is-accent {
+  border-color: rgba(114, 246, 213, 0.26);
+}
+
+.bottom-nav {
+  position: fixed;
+  left: max(1rem, env(safe-area-inset-left, 0px) + 1rem);
+  right: max(1rem, env(safe-area-inset-right, 0px) + 1rem);
+  bottom: max(1rem, env(safe-area-inset-bottom, 0px) + 1rem);
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.65rem;
+  padding: 0.7rem;
+  border-radius: 1.45rem;
+  z-index: 4;
+}
+
+.nav-chip {
+  min-height: 3rem;
+  border-radius: 1rem;
+  background: rgba(8, 15, 28, 0.6);
+  border: 1px solid transparent;
+  color: var(--text-secondary);
+  font-weight: 700;
+}
+
+.nav-chip.active {
+  background: linear-gradient(135deg, rgba(114, 246, 213, 0.2), rgba(109, 169, 255, 0.18));
+  border-color: rgba(114, 246, 213, 0.28);
+  color: var(--text-primary);
+}
+
+.airport-marker,
+.flight-marker {
+  position: absolute;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  transform: translate(-50%, -50%);
+}
+
+.airport-marker {
+  display: grid;
+  place-items: center;
+  gap: 0.25rem;
+}
+
+.airport-label,
+.flight-tag {
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+  background: rgba(5, 10, 19, 0.72);
+  border: 1px solid rgba(255,255,255,0.08);
+  white-space: nowrap;
+}
+
+.airport-miniature {
+  position: relative;
+  width: 1.55rem;
+  height: 1.55rem;
+  transform-style: preserve-3d;
+}
+
+.airport-platform,
+.airport-terminal,
+.airport-tower,
+.airport-beacon {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.airport-platform {
+  bottom: 0.1rem;
+  width: 1.6rem;
+  height: 0.48rem;
+  border-radius: 999px;
+  background: radial-gradient(circle at center, rgba(114, 246, 213, 0.36), rgba(109, 169, 255, 0.1));
+  box-shadow: 0 0 18px rgba(114, 246, 213, calc(0.20 * var(--airport-glow, 1)));
+}
+
+.airport-terminal {
+  bottom: 0.35rem;
+  width: 1rem;
+  height: 0.55rem;
+  border-radius: 0.45rem;
+  background: linear-gradient(180deg, rgba(161, 220, 255, 0.9), rgba(57, 82, 136, 0.72));
+  box-shadow: 0 8px 18px rgba(0,0,0,0.18);
+}
+
+.airport-tower {
+  bottom: 0.75rem;
+  width: 0.36rem;
+  height: 0.65rem;
+  border-radius: 999px 999px 0.18rem 0.18rem;
+  background: linear-gradient(180deg, rgba(233,244,255,0.95), rgba(103, 139, 194, 0.9));
+}
+
+.airport-beacon {
+  bottom: 1.33rem;
+  width: 0.28rem;
+  height: 0.28rem;
+  border-radius: 999px;
+  background: var(--accent);
+  box-shadow: 0 0 14px rgba(114, 246, 213, 0.7);
+}
+
+.flight-marker {
+  display: grid;
+  place-items: center;
+  gap: 0.35rem;
+  transform-origin: center center;
+}
+
+.flight-body-shell {
+  position: relative;
+  width: 2rem;
+  height: 0.9rem;
+}
+
+.flight-body-core,
+.flight-tail,
+.flight-glow {
+  position: absolute;
+  inset: 0;
+}
+
+.flight-body-core {
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(244,247,251,0.92), rgba(114,246,213,0.78));
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.12), 0 8px 20px rgba(0,0,0,0.3);
+}
+
+.flight-body-core::before,
+.flight-body-core::after {
+  content: "";
+  position: absolute;
+  background: linear-gradient(180deg, rgba(221,235,255,0.9), rgba(88, 117, 165, 0.82));
+  border-radius: 0.35rem;
+}
+
+.flight-body-core::before {
+  width: 1.08rem;
+  height: 0.18rem;
+  left: 0.47rem;
+  top: 0.1rem;
+}
+
+.flight-body-core::after {
+  width: 1.08rem;
+  height: 0.18rem;
+  left: 0.47rem;
+  bottom: 0.1rem;
+}
+
+.flight-tail {
+  width: 0.34rem;
+  height: 0.82rem;
+  left: auto;
+  right: 0.08rem;
+  top: 0.04rem;
+  border-radius: 0.3rem;
+  background: linear-gradient(180deg, rgba(221,235,255,0.9), rgba(88, 117, 165, 0.82));
+}
+
+.flight-glow {
+  border-radius: 999px;
+  box-shadow: 0 0 18px rgba(109, 169, 255, 0.4);
+}
+
+.flight-marker.is-selected .flight-glow {
+  box-shadow: 0 0 24px rgba(114, 246, 213, 0.62);
+}
+
+.flight-marker.is-conflict .flight-glow {
+  box-shadow: 0 0 26px rgba(255, 111, 119, 0.78);
+}
+
+.flight-marker.is-warning .flight-glow {
+  box-shadow: 0 0 20px rgba(255, 177, 94, 0.62);
+}
+
+.package-grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.package-card {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.package-cover {
+  min-height: 7.2rem;
+  border-radius: 1.2rem;
+  border: 1px solid var(--line-soft);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
+  overflow: hidden;
+}
+
+.package-cover::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(5,10,19,0.18) 35%, rgba(5,10,19,0.62) 100%);
+}
+
+.preferences-grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.toggle-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.toggle-card input {
+  accent-color: var(--accent);
+}
+
+.toast-layer {
+  position: fixed;
+  right: 1rem;
+  bottom: 6rem;
+  display: grid;
+  gap: 0.55rem;
+  width: min(24rem, calc(100vw - 2rem));
+  z-index: 6;
+}
+
+.toast {
+  padding: 0.9rem 1rem;
+  border-radius: 1rem;
+  border: 1px solid var(--line-soft);
+  background: linear-gradient(180deg, rgba(16, 28, 49, 0.94), rgba(7, 14, 28, 0.92));
+  box-shadow: var(--shadow-hard);
+  color: var(--text-primary);
+}
+
+.toast.warning {
+  border-color: rgba(255, 177, 94, 0.32);
+}
+
+.toast.danger {
+  border-color: rgba(255, 111, 119, 0.34);
+}
+
+.modal-layer {
+  position: fixed;
+  inset: 0;
+  background: rgba(3, 8, 14, 0.78);
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  z-index: 7;
+}
+
+.modal-card {
+  width: min(34rem, 100%);
+  padding: 1.2rem;
+  border-radius: var(--radius-lg);
+}
+
+.file-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stack-form,
+.editor-form,
+.config-grid {
+  display: grid;
+  gap: 0.85rem;
+}
+
+label span {
+  display: inline-block;
+  margin-bottom: 0.35rem;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  border: 1px solid var(--line-soft);
+  background: rgba(5, 10, 19, 0.62);
+  color: var(--text-primary);
+  border-radius: 0.95rem;
+  padding: 0.85rem 0.95rem;
+  outline: none;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: rgba(114, 246, 213, 0.42);
+  box-shadow: 0 0 0 4px rgba(114, 246, 213, 0.12);
+}
+
+textarea {
+  resize: vertical;
+  min-height: 8rem;
+}
+
+.credential-hint {
+  margin-top: 1rem;
+  color: var(--text-muted);
+}
+
+@media (min-width: 720px) {
+  .app-shell {
+    padding: 1.2rem 1.2rem 1.6rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .mission-grid,
+  .package-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .hero-card {
+    grid-template-columns: 1.6fr 1fr;
+    align-items: stretch;
+  }
+
+  .hud-metrics {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .ops-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .preferences-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .command-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .bottom-nav {
+    position: static;
+    margin-top: 0.2rem;
+  }
+}
+
+@media (min-width: 1080px) {
+  .main-grid {
+    gap: 1.1rem;
+  }
+
+  .world-stage {
+    min-height: 38rem;
+  }
+
+  .package-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .mission-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .topbar {
+    padding: 1rem 1.2rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

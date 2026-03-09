@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#08111f" />
+    <meta name="description" content="SkyFlow Control — simulador mobile-first de controle de tráfego aéreo com carreira, DLCs e painel Admin local." />
+    <title>SkyFlow Control</title>
+    <link rel="icon" type="image/svg+xml" href="./assets/branding/favicon.svg" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="stylesheet" href="./css/tokens.css" />
+    <link rel="stylesheet" href="./css/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <div class="ambient ambient-a"></div>
+      <div class="ambient ambient-b"></div>
+
+      <header class="topbar glass-panel">
+        <div class="brand-block">
+          <img class="brand-logo" src="./assets/branding/logo.svg" alt="SkyFlow Control" />
+          <div>
+            <p class="eyebrow">Controle global premium</p>
+            <h1>SkyFlow Control</h1>
+          </div>
+        </div>
+
+        <div class="topbar-actions">
+          <div class="rank-pill" id="rankPill"></div>
+          <button class="chrome-button" id="pauseButton" type="button" disabled>Pausar</button>
+          <a class="chrome-button chrome-link" href="./admin.html">Admin</a>
+        </div>
+      </header>
+
+      <main class="main-grid">
+        <section class="screen active" id="dashboardScreen" aria-labelledby="dashboardTitle">
+          <div class="hero-card glass-panel">
+            <div class="hero-copy">
+              <p class="eyebrow">Carreira operacional</p>
+              <h2 id="dashboardTitle">Dirija a malha aérea mundial com foco mobile-first.</h2>
+              <p class="hero-text">
+                Controle separações, ajuste altitude, desvie de células meteorológicas e expanda sua rede com DLCs modulares.
+              </p>
+              <div class="hero-actions">
+                <button class="primary-button" id="startScenarioButton" type="button">Iniciar janela</button>
+                <button class="secondary-button" id="openContentButton" type="button">Gerenciar conteúdo</button>
+              </div>
+            </div>
+
+            <div class="hero-side">
+              <div class="hero-stat-card">
+                <span class="stat-label">Pontuação alvo</span>
+                <strong id="heroTargetScore">—</strong>
+              </div>
+              <div class="hero-stat-card">
+                <span class="stat-label">Duração</span>
+                <strong id="heroDuration">—</strong>
+              </div>
+              <div class="hero-stat-card">
+                <span class="stat-label">Pacotes ativos</span>
+                <strong id="heroActivePackages">—</strong>
+              </div>
+            </div>
+          </div>
+
+          <section class="stats-grid" id="statsGrid" aria-label="Resumo de carreira"></section>
+
+          <section class="section-block glass-panel">
+            <div class="section-head">
+              <div>
+                <p class="eyebrow">Sessões disponíveis</p>
+                <h3>Briefings ao vivo</h3>
+              </div>
+              <span class="tiny-pill" id="selectedScenarioTag">Pronto</span>
+            </div>
+            <div class="mission-grid" id="scenarioGrid"></div>
+          </section>
+        </section>
+
+        <section class="screen" id="gameScreen" aria-labelledby="gameTitle">
+          <div class="game-hud glass-panel">
+            <div>
+              <p class="eyebrow">Operação em andamento</p>
+              <h2 id="gameTitle">Janela ativa</h2>
+            </div>
+            <div class="hud-metrics">
+              <div class="metric-card"><span>Tempo</span><strong id="hudTime">00:00</strong></div>
+              <div class="metric-card"><span>Score</span><strong id="hudScore">0</strong></div>
+              <div class="metric-card"><span>Calma</span><strong id="hudCalm">100</strong></div>
+              <div class="metric-card"><span>Landings</span><strong id="hudLandings">0</strong></div>
+            </div>
+          </div>
+
+          <div class="world-stage glass-panel" id="worldStage">
+            <canvas id="worldCanvas"></canvas>
+            <canvas id="fxCanvas"></canvas>
+            <div id="markerLayer" class="marker-layer"></div>
+            <div class="world-legend glass-strip">
+              <span><i class="legend-dot dot-green"></i> Fluxo estável</span>
+              <span><i class="legend-dot dot-gold"></i> Atenção</span>
+              <span><i class="legend-dot dot-red"></i> Conflito</span>
+            </div>
+          </div>
+
+          <div class="ops-grid">
+            <aside class="glass-panel flight-strip-panel">
+              <div class="section-head compact">
+                <div>
+                  <p class="eyebrow">Malha ativa</p>
+                  <h3>Flight strips</h3>
+                </div>
+                <span class="tiny-pill" id="liveFlightsCount">0 voos</span>
+              </div>
+              <div id="flightStripList" class="flight-strip-list"></div>
+            </aside>
+
+            <section class="glass-panel command-dock">
+              <div class="section-head compact">
+                <div>
+                  <p class="eyebrow">Controle direto</p>
+                  <h3 id="selectedFlightTitle">Selecione um voo</h3>
+                </div>
+                <span class="tiny-pill" id="selectedFlightTag">Aguardando</span>
+              </div>
+
+              <div class="selected-flight-card" id="selectedFlightCard">
+                <p>Toque em uma aeronave ou faixa para abrir comandos operacionais.</p>
+              </div>
+
+              <div class="command-grid" id="commandGrid">
+                <button class="command-button" data-command="altitudeUp" type="button">ALT +</button>
+                <button class="command-button" data-command="altitudeDown" type="button">ALT −</button>
+                <button class="command-button" data-command="speedUp" type="button">SPD +</button>
+                <button class="command-button" data-command="speedDown" type="button">SPD −</button>
+                <button class="command-button" data-command="vectorLeft" type="button">Vetor ◀</button>
+                <button class="command-button" data-command="vectorRight" type="button">Vetor ▶</button>
+                <button class="command-button" data-command="hold" type="button">Holding</button>
+                <button class="command-button" data-command="priority" type="button">Prioridade</button>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <section class="screen" id="contentScreen" aria-labelledby="contentTitle">
+          <section class="section-block glass-panel">
+            <div class="section-head">
+              <div>
+                <p class="eyebrow">Expansões e módulos</p>
+                <h2 id="contentTitle">Catálogo de conteúdo</h2>
+              </div>
+              <span class="tiny-pill" id="contentStatusTag">Sincronizado</span>
+            </div>
+            <div id="packageGrid" class="package-grid"></div>
+          </section>
+
+          <section class="section-block glass-panel">
+            <div class="section-head">
+              <div>
+                <p class="eyebrow">Configuração local</p>
+                <h3>Preferências do operador</h3>
+              </div>
+            </div>
+            <div class="preferences-grid">
+              <label class="toggle-card">
+                <input id="sfxToggle" type="checkbox" checked />
+                <span>Áudio tático</span>
+              </label>
+              <label class="toggle-card">
+                <input id="motionToggle" type="checkbox" />
+                <span>Reduzir movimento</span>
+              </label>
+              <button class="secondary-button" id="resetProfileButton" type="button">Resetar carreira local</button>
+            </div>
+          </section>
+        </section>
+      </main>
+
+      <nav class="bottom-nav glass-panel">
+        <button class="nav-chip active" type="button" data-screen="dashboard">Dashboard</button>
+        <button class="nav-chip" type="button" data-screen="game">Operação</button>
+        <button class="nav-chip" type="button" data-screen="content">Conteúdo</button>
+      </nav>
+
+      <div id="toastLayer" class="toast-layer" aria-live="polite" aria-atomic="true"></div>
+      <div id="modalLayer" class="modal-layer" hidden></div>
+    </div>
+
+    <script type="module" src="./js/app.js"></script>
+  </body>
+</html>

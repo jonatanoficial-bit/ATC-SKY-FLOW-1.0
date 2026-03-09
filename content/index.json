@@ -1,0 +1,20 @@
+{
+  "version": "1.0.0",
+  "packages": [
+    {
+      "id": "core",
+      "manifest": "./core/manifest.json",
+      "type": "core"
+    },
+    {
+      "id": "dlc_north_atlantic",
+      "manifest": "./dlc_north_atlantic/manifest.json",
+      "type": "dlc"
+    },
+    {
+      "id": "dlc_pacific_horizons",
+      "manifest": "./dlc_pacific_horizons/manifest.json",
+      "type": "dlc"
+    }
+  ]
+}

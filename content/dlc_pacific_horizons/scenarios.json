@@ -1,0 +1,42 @@
+[
+  {
+    "id": "pacific_sunset_grid",
+    "packageId": "dlc_pacific_horizons",
+    "title": "Horizonte Pacífico",
+    "rankRequired": "director",
+    "difficulty": "Diretor",
+    "blurb": "Controle rotas longas sobre o Pacífico com visibilidade variável e grandes separações.",
+    "spawnInterval": 4.9,
+    "maxActive": 9,
+    "targetScore": 1580,
+    "duration": 210,
+    "conflictRadius": 0.06,
+    "preferredAirports": [
+      "SFO",
+      "HNL",
+      "AKL",
+      "ICN",
+      "NRT",
+      "SYD",
+      "PPT"
+    ],
+    "weatherCells": [
+      {
+        "id": "pacific_cells",
+        "lat": 12,
+        "lon": -153,
+        "radius": 0.055,
+        "label": "Células Tropicais",
+        "severity": 0.7
+      },
+      {
+        "id": "tasman_wind",
+        "lat": -34,
+        "lon": 163,
+        "radius": 0.04,
+        "label": "Tasman Drift",
+        "severity": 0.6
+      }
+    ]
+  }
+]

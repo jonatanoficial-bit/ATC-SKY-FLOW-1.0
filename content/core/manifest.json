@@ -1,0 +1,21 @@
+{
+  "id": "core",
+  "type": "core",
+  "version": "1.0.0",
+  "title": "Global Core",
+  "subtitle": "Rede inicial mundial",
+  "description": "Base jogável com hubs globais, carreira inicial e sessões transatlânticas e euro-asiáticas.",
+  "unlockRank": "cadet",
+  "enabledByDefault": true,
+  "theme": {
+    "accent": "#72f6d5",
+    "glow": "#6da9ff",
+    "surface": "#0d1729"
+  },
+  "coverAsset": "./assets/branding/cover-core.svg",
+  "entrypoints": {
+    "airports": "./airports.json",
+    "routes": "./routes.json",
+    "scenarios": "./scenarios.json"
+  }
+}

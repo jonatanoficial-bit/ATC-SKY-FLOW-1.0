@@ -1,0 +1,21 @@
+{
+  "id": "dlc_pacific_horizons",
+  "type": "dlc",
+  "version": "1.0.0",
+  "title": "Pacific Horizons",
+  "subtitle": "DLC do Pacífico",
+  "description": "Expansão com trechos transoceânicos longos, hubs asiáticos adicionais e pressão de separação.",
+  "unlockRank": "director",
+  "enabledByDefault": false,
+  "theme": {
+    "accent": "#ffd37b",
+    "glow": "#8f7bff",
+    "surface": "#111a31"
+  },
+  "coverAsset": "./assets/branding/cover-pacific.svg",
+  "entrypoints": {
+    "airports": "./airports.json",
+    "routes": "./routes.json",
+    "scenarios": "./scenarios.json"
+  }
+}

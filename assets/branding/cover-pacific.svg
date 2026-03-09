@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 720" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="70" y1="40" x2="1100" y2="680" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFD37B"/>
+      <stop offset="1" stop-color="#8F7BFF"/>
+    </linearGradient>
+    <radialGradient id="rad" cx="0" cy="0" r="1" gradientTransform="translate(240 120) rotate(25) scale(760 520)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#142849"/>
+      <stop offset="1" stop-color="#07101F"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="720" rx="56" fill="url(#rad)"/>
+  <circle cx="970" cy="120" r="240" fill="#FFD37B" fill-opacity=".14"/>
+  <circle cx="220" cy="640" r="300" fill="#8F7BFF" fill-opacity=".12"/>
+  <path d="M78 612c124-74 264-110 422-110 176 0 340 44 522 126" stroke="url(#bg)" stroke-width="14" stroke-linecap="round"/>
+  <path d="M354 264c86-60 186-90 302-90 154 0 296 48 402 140" stroke="rgba(255,255,255,.22)" stroke-width="10" stroke-linecap="round"/>
+  <path d="M378 320l170-76" stroke="rgba(255,255,255,.18)" stroke-width="7" stroke-linecap="round"/>
+  <path d="M484 226l60 18-24 44" stroke="rgba(255,255,255,.36)" stroke-width="7" stroke-linecap="round"/>
+  <rect x="82" y="74" width="456" height="92" rx="28" fill="rgba(255,255,255,.06)" stroke="rgba(255,255,255,.08)"/>
+  <text x="116" y="120" fill="#F4F7FB" font-size="52" font-weight="700" font-family="Inter, Arial, sans-serif">Pacific Horizons</text>
+  <text x="116" y="154" fill="rgba(244,247,251,.72)" font-size="24" font-weight="600" font-family="Inter, Arial, sans-serif">Fluxo transoceânico expandido</text>
+  <rect x="862" y="420" width="210" height="140" rx="28" fill="rgba(255,255,255,.06)" stroke="rgba(255,255,255,.08)"/>
+  <path d="M908 496h118" stroke="url(#bg)" stroke-width="18" stroke-linecap="round"/>
+  <path d="M946 450h42v86h-42z" fill="rgba(255,255,255,.78)" rx="12"/>
+  <circle cx="968" cy="432" r="14" fill="#FFD37B"/>
+</svg>

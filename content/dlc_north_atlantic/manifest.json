@@ -1,21 +1,12 @@
 {
-  "id": "dlc_north_atlantic",
-  "type": "dlc",
-  "version": "1.0.0",
-  "title": "North Atlantic Flow",
-  "subtitle": "DLC do Atlântico Norte",
-  "description": "Expansão com hubs do Atlântico Norte, corredores polares e mais densidade de fluxo.",
-  "unlockRank": "controller",
-  "enabledByDefault": false,
-  "theme": {
-    "accent": "#89d0ff",
-    "glow": "#6da9ff",
-    "surface": "#0f1c33"
-  },
-  "coverAsset": "./assets/branding/cover-atlantic.svg",
-  "entrypoints": {
-    "airports": "./airports.json",
-    "routes": "./routes.json",
-    "scenarios": "./scenarios.json"
-  }
+  "id":"dlc_north_atlantic",
+  "title":"North Atlantic",
+  "subtitle":"DLC oceânica",
+  "version":"1.0.0",
+  "type":"dlc",
+  "unlockRank":"controller",
+  "enabledByDefault":false,
+  "description":"Abre hubs do Atlântico Norte e aumenta a malha oceânica.",
+  "theme":{"accent":"#9ed9ff","glow":"#7aa7ff","surface":"#11203e"},
+  "datasets":{"airports":"./airports.json","routes":"./routes.json","scenarios":"./scenarios.json"}
 }

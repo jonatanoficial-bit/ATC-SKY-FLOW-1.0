@@ -1,63 +1,39 @@
 export class SoundEngine {
   constructor(enabled = true) {
     this.enabled = enabled;
-    this.audioContext = null;
+    this.context = null;
   }
 
   async resume() {
     if (!this.enabled) return;
-    if (!this.audioContext) {
-      this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    if (!this.context) {
+      const Context = window.AudioContext || window.webkitAudioContext;
+      if (!Context) return;
+      this.context = new Context();
     }
-    if (this.audioContext.state === 'suspended') {
-      await this.audioContext.resume();
-    }
-  }
-
-  setEnabled(enabled) {
-    this.enabled = enabled;
-    if (!enabled && this.audioContext && this.audioContext.state === 'running') {
-      this.audioContext.suspend();
+    if (this.context.state === 'suspended') {
+      await this.context.resume();
     }
   }
 
-  async tone({ frequency = 440, duration = 0.08, type = 'sine', gainValue = 0.03 }) {
-    if (!this.enabled) return;
-    await this.resume();
-    if (!this.audioContext) return;
+  setEnabled(value) {
+    this.enabled = value;
+  }
 
-    const context = this.audioContext;
-    const oscillator = context.createOscillator();
-    const gain = context.createGain();
-
-    oscillator.type = type;
-    oscillator.frequency.value = frequency;
-    gain.gain.value = gainValue;
-
+  play(type = 'command') {
+    if (!this.enabled || !this.context) return;
+    const oscillator = this.context.createOscillator();
+    const gain = this.context.createGain();
+    oscillator.type = 'sine';
+    const freq = type === 'conflict' ? 220 : type === 'warning' ? 320 : type === 'landed' ? 540 : 430;
+    oscillator.frequency.value = freq;
+    gain.gain.value = 0.0001;
     oscillator.connect(gain);
-    gain.connect(context.destination);
-
-    const now = context.currentTime;
-    gain.gain.setValueAtTime(0.0001, now);
-    gain.gain.exponentialRampToValueAtTime(gainValue, now + 0.01);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
-
+    gain.connect(this.context.destination);
+    const now = this.context.currentTime;
+    gain.gain.exponentialRampToValueAtTime(0.05, now + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + (type === 'conflict' ? 0.28 : 0.16));
     oscillator.start(now);
-    oscillator.stop(now + duration + 0.01);
-  }
-
-  play(eventType) {
-    const presets = {
-      'flight-spawn': { frequency: 520, duration: 0.05, type: 'triangle', gainValue: 0.018 },
-      command: { frequency: 640, duration: 0.06, type: 'sine', gainValue: 0.02 },
-      conflict: { frequency: 220, duration: 0.16, type: 'sawtooth', gainValue: 0.03 },
-      landed: { frequency: 760, duration: 0.12, type: 'triangle', gainValue: 0.025 },
-      warning: { frequency: 310, duration: 0.1, type: 'square', gainValue: 0.018 }
-    };
-
-    const preset = presets[eventType];
-    if (preset) {
-      this.tone(preset);
-    }
+    oscillator.stop(now + (type === 'conflict' ? 0.32 : 0.2));
   }
 }

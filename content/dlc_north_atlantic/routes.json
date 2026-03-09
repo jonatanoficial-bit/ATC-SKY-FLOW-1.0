@@ -1,65 +1,6 @@
 [
-  {
-    "id": "BOS-DUB",
-    "from": "BOS",
-    "to": "DUB",
-    "demand": 6,
-    "bidirectional": true
-  },
-  {
-    "id": "YYZ-LHR",
-    "from": "YYZ",
-    "to": "LHR",
-    "demand": 8,
-    "bidirectional": true
-  },
-  {
-    "id": "YYZ-AMS",
-    "from": "YYZ",
-    "to": "AMS",
-    "demand": 7,
-    "bidirectional": true
-  },
-  {
-    "id": "LIS-GRU",
-    "from": "LIS",
-    "to": "GRU",
-    "demand": 7,
-    "bidirectional": true
-  },
-  {
-    "id": "KEF-JFK",
-    "from": "KEF",
-    "to": "JFK",
-    "demand": 5,
-    "bidirectional": true
-  },
-  {
-    "id": "DUB-LHR",
-    "from": "DUB",
-    "to": "LHR",
-    "demand": 5,
-    "bidirectional": true
-  },
-  {
-    "id": "AMS-DXB",
-    "from": "AMS",
-    "to": "DXB",
-    "demand": 7,
-    "bidirectional": true
-  },
-  {
-    "id": "BOS-KEF",
-    "from": "BOS",
-    "to": "KEF",
-    "demand": 4,
-    "bidirectional": true
-  },
-  {
-    "id": "LIS-MAD",
-    "from": "LIS",
-    "to": "MAD",
-    "demand": 4,
-    "bidirectional": true
-  }
+  {"id":"bos-dub","from":"BOS","to":"DUB","difficulty":0.95},
+  {"id":"jfk-kef","from":"JFK","to":"KEF","difficulty":1.05},
+  {"id":"kef-lhr","from":"KEF","to":"LHR","difficulty":0.9},
+  {"id":"dub-cdg","from":"DUB","to":"CDG","difficulty":0.85}
 ]

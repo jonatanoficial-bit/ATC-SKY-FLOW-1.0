@@ -1,7 +1,5 @@
-import { storage, STORAGE_KEYS, createDownload, readFileAsText, readFileAsDataUrl } from '../core/storage.js';
+import { storage } from '../core/storage.js';
 import { ContentManager } from '../core/content-manager.js';
-import { loadProfile, saveProfile, togglePackageForProfile } from '../core/profile-manager.js';
-import { DEFAULT_GAME_CONFIG } from '../core/fallback-content.js';
 
 const refs = {
   loginPanel: document.getElementById('loginPanel'),
@@ -9,356 +7,283 @@ const refs = {
   loginForm: document.getElementById('loginForm'),
   logoutButton: document.getElementById('logoutButton'),
   adminStats: document.getElementById('adminStats'),
-  packageGrid: document.getElementById('adminPackageGrid'),
-  exportStateButton: document.getElementById('exportStateButton'),
-  importStateInput: document.getElementById('importStateInput'),
-  loadTemplateButton: document.getElementById('loadTemplateButton'),
-  credentialForm: document.getElementById('credentialForm'),
+  adminPackageGrid: document.getElementById('adminPackageGrid'),
   packageForm: document.getElementById('packageForm'),
   editorTitle: document.getElementById('editorTitle'),
   editorTag: document.getElementById('editorTag'),
   clearEditorButton: document.getElementById('clearEditorButton'),
+  exportStateButton: document.getElementById('exportStateButton'),
+  importStateInput: document.getElementById('importStateInput'),
+  loadTemplateButton: document.getElementById('loadTemplateButton'),
   importPackageInput: document.getElementById('importPackageInput'),
-  coverImageInput: document.getElementById('coverImageInput'),
   configForm: document.getElementById('configForm'),
+  coverImageInput: document.getElementById('coverImageInput'),
+  credentialForm: document.getElementById('credentialForm'),
   toastLayer: document.getElementById('adminToastLayer')
 };
 
-const state = {
-  contentManager: new ContentManager('./content'),
-  profile: loadProfile(),
-  catalog: null,
-  coverImage: '',
-  editingPackageId: null
+const contentManager = new ContentManager('./content');
+const AUTH_KEY = 'skyflow.admin.auth.v1';
+const SESSION_KEY = 'skyflow.admin.session.v1';
+let editingPackageId = null;
+let coverDataUrl = '';
+
+const showToast = (message, type = 'info') => {
+  const toast = document.createElement('article');
+  toast.className = `toast ${type === 'warning' ? 'warning' : type === 'danger' ? 'danger' : ''}`;
+  toast.textContent = message;
+  refs.toastLayer.append(toast);
+  setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateY(12px)'; }, 2300);
+  setTimeout(() => toast.remove(), 3100);
 };
 
-const ADMIN_SESSION_KEY = 'skyflow.admin.session';
-const DEFAULT_ADMIN = {
-  username: 'admin',
-  password: 'tower123'
+const getAuth = () => storage.get(AUTH_KEY, { username: 'admin', password: 'tower123' });
+const setSession = (active) => storage.set(SESSION_KEY, { active });
+const isLoggedIn = () => Boolean(storage.get(SESSION_KEY, { active: false }).active);
+const downloadJson = (name, data) => {
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = name;
+  a.click();
+  URL.revokeObjectURL(url);
 };
-
-const toast = (message, type = 'info') => {
-  const node = document.createElement('article');
-  node.className = `toast ${type === 'warning' ? 'warning' : type === 'danger' ? 'danger' : ''}`;
-  node.textContent = message;
-  refs.toastLayer.append(node);
-  setTimeout(() => node.remove(), 2800);
-};
-
-const getAdminCredentials = () => storage.get(STORAGE_KEYS.ADMIN, DEFAULT_ADMIN);
-const saveAdminCredentials = (credentials) => storage.set(STORAGE_KEYS.ADMIN, credentials);
-
-const sanitizeEditorData = (formData) => ({
-  id: String(formData.get('id') || '').trim(),
-  title: String(formData.get('title') || '').trim(),
-  subtitle: String(formData.get('subtitle') || '').trim(),
-  version: String(formData.get('version') || '1.0.0').trim() || '1.0.0',
-  unlockRank: String(formData.get('unlockRank') || 'cadet'),
-  description: String(formData.get('description') || '').trim(),
-  theme: {
-    accent: String(formData.get('accent') || '#72f6d5'),
-    glow: String(formData.get('glow') || '#6da9ff'),
-    surface: '#0f1830'
-  }
-});
-
-const setAuthState = (authenticated) => {
-  refs.loginPanel.hidden = authenticated;
-  refs.adminPanel.hidden = !authenticated;
-  refs.logoutButton.hidden = !authenticated;
-  if (authenticated) {
-    sessionStorage.setItem(ADMIN_SESSION_KEY, '1');
-  } else {
-    sessionStorage.removeItem(ADMIN_SESSION_KEY);
+const parseArray = (value, label) => {
+  try {
+    const parsed = JSON.parse(value || '[]');
+    if (!Array.isArray(parsed)) throw new Error('Precisa ser array.');
+    return parsed;
+  } catch (error) {
+    throw new Error(`${label}: ${error.message}`);
   }
 };
 
-const renderStats = () => {
-  const packages = state.contentManager.getAllPackages();
-  const customPackages = packages.filter((pkg) => pkg.origin === 'custom');
-  const activePackages = state.profile.activePackages || [];
+const setWorkspaceVisibility = (active) => {
+  refs.loginPanel.hidden = active;
+  refs.adminPanel.hidden = !active;
+  refs.logoutButton.hidden = !active;
+};
+
+const renderStats = async () => {
+  await contentManager.loadCatalog();
+  const builtIn = contentManager.builtInPackages.length;
+  const custom = contentManager.getCustomPackages().length;
+  const config = contentManager.getConfig();
   refs.adminStats.innerHTML = `
-    <article class="stat-surface"><span class="stat-label">Pacotes</span><strong>${packages.length}</strong><small>Total carregado</small></article>
-    <article class="stat-surface"><span class="stat-label">Custom</span><strong>${customPackages.length}</strong><small>Editor local</small></article>
-    <article class="stat-surface"><span class="stat-label">Ativos</span><strong>${activePackages.length}</strong><small>No perfil atual</small></article>
-    <article class="stat-surface"><span class="stat-label">XP perfil</span><strong>${state.profile.xp}</strong><small>Reflete no unlock</small></article>
-  `;
+    <article class="stat-surface"><span class="stat-label">Built-in</span><strong>${builtIn}</strong><small>Pacotes fixos do jogo</small></article>
+    <article class="stat-surface"><span class="stat-label">Custom</span><strong>${custom}</strong><small>Pacotes salvos localmente</small></article>
+    <article class="stat-surface"><span class="stat-label">Spawn base</span><strong>${config.baseSpawnInterval}s</strong><small>Config global</small></article>
+    <article class="stat-surface"><span class="stat-label">Duração padrão</span><strong>${config.sessionDuration}s</strong><small>Ruleset local</small></article>`;
 };
 
-const packageCoverStyle = (pkg) => {
-  if (pkg.coverImage) return `background-image: url('${pkg.coverImage}');`;
-  if (pkg.coverAsset) return `background-image: url('${pkg.coverAsset}');`;
-  return `background-image: linear-gradient(135deg, ${pkg.theme?.accent || '#72f6d5'}, ${pkg.theme?.glow || '#6da9ff'});`;
+const fillForm = (pkg = null) => {
+  editingPackageId = pkg?.id || null;
+  refs.editorTitle.textContent = pkg ? `Editar ${pkg.title}` : 'Novo pacote';
+  refs.editorTag.textContent = pkg?.builtIn ? 'Clone built-in antes de salvar' : 'JSON validado no save';
+  refs.packageForm.id.value = pkg?.id || '';
+  refs.packageForm.title.value = pkg?.title || '';
+  refs.packageForm.subtitle.value = pkg?.subtitle || '';
+  refs.packageForm.version.value = pkg?.version || '1.0.0';
+  refs.packageForm.unlockRank.value = pkg?.unlockRank || 'cadet';
+  refs.packageForm.accent.value = pkg?.theme?.accent || '#72f6d5';
+  refs.packageForm.glow.value = pkg?.theme?.glow || '#6da9ff';
+  refs.packageForm.description.value = pkg?.description || '';
+  refs.packageForm.airports.value = JSON.stringify(pkg?.datasets?.airports || [], null, 2);
+  refs.packageForm.routes.value = JSON.stringify(pkg?.datasets?.routes || [], null, 2);
+  refs.packageForm.scenarios.value = JSON.stringify(pkg?.datasets?.scenarios || [], null, 2);
+  coverDataUrl = pkg?.coverImage || '';
 };
 
-const renderPackages = () => {
-  const packages = state.contentManager.getAllPackages();
-  refs.packageGrid.innerHTML = packages.map((pkg) => {
-    const active = (state.profile.activePackages || []).includes(pkg.id) || pkg.enabledByDefault;
-    const builtIn = pkg.origin !== 'custom';
-    return `
-      <article class="package-card ${active ? 'is-active' : ''}">
-        <div class="package-cover" style="${packageCoverStyle(pkg)}"></div>
-        <div>
-          <p class="eyebrow">${builtIn ? 'Built-in' : 'Custom local'}</p>
-          <h4>${pkg.title}</h4>
-          <p class="supporting-text">${pkg.description}</p>
-        </div>
-        <div class="package-meta">
-          <span>${pkg.stats.airports} aeroportos</span>
-          <span>${pkg.stats.routes} rotas</span>
-          <span>${pkg.stats.scenarios} cenários</span>
-        </div>
-        <div class="hero-actions">
-          <button class="secondary-button" type="button" data-package-clone="${pkg.id}">${builtIn ? 'Clonar' : 'Editar'}</button>
-          <button class="secondary-button" type="button" data-package-toggle="${pkg.id}" ${pkg.id === 'core' ? 'disabled' : ''}>${active ? 'Desativar' : 'Ativar'}</button>
-          ${builtIn ? '' : `<button class="secondary-button" type="button" data-package-delete="${pkg.id}">Excluir</button>`}
-          <button class="secondary-button" type="button" data-package-export="${pkg.id}">Exportar</button>
-        </div>
-      </article>
-    `;
-  }).join('');
+const renderPackages = async () => {
+  const packages = contentManager.getAllPackages();
+  refs.adminPackageGrid.innerHTML = packages.map((pkg) => `
+    <article class="package-card ${pkg.builtIn ? '' : 'is-active'}">
+      <div class="package-cover" style="background-image:${pkg.coverImage ? `url('${pkg.coverImage}')` : `linear-gradient(135deg,${pkg.theme?.accent || '#72f6d5'},${pkg.theme?.glow || '#6da9ff'})`}"></div>
+      <div><p class="eyebrow">${pkg.builtIn ? 'Built-in' : 'Custom'}</p><h4>${pkg.title}</h4><p class="supporting-text">${pkg.description}</p></div>
+      <div class="package-meta"><span>${pkg.datasets.airports?.length || 0} aeroportos</span><span>${pkg.datasets.routes?.length || 0} rotas</span><span>${pkg.datasets.scenarios?.length || 0} cenários</span></div>
+      <div class="hero-actions">
+        <button class="secondary-button" type="button" data-clone="${pkg.id}">${pkg.builtIn ? 'Clonar' : 'Editar'}</button>
+        <button class="primary-button" type="button" data-export="${pkg.id}">Exportar</button>
+        ${pkg.builtIn ? '' : `<button class="secondary-button" type="button" data-delete="${pkg.id}">Remover</button>`}
+      </div>
+    </article>`).join('');
 };
 
-const renderConfig = () => {
-  const config = { ...DEFAULT_GAME_CONFIG, ...(storage.get(STORAGE_KEYS.GAME_CONFIG, {}) || {}) };
+const refreshAll = async () => {
+  await renderStats();
+  await renderPackages();
+  const config = contentManager.getConfig();
   Object.entries(config).forEach(([key, value]) => {
-    const input = refs.configForm.elements.namedItem(key);
-    if (input) {
-      input.value = String(value);
-    }
+    if (refs.configForm[key]) refs.configForm[key].value = value;
   });
+  const auth = getAuth();
+  refs.credentialForm.username.value = auth.username;
+  refs.credentialForm.password.value = auth.password;
 };
 
-const fillEditor = (pkg) => {
-  refs.editorTitle.textContent = pkg?.id ? `Editar ${pkg.title}` : 'Novo pacote';
-  refs.editorTag.textContent = pkg?.origin === 'custom' ? 'Pacote local' : 'Clonando built-in';
-  refs.packageForm.elements.id.value = pkg?.id || '';
-  refs.packageForm.elements.title.value = pkg?.title || '';
-  refs.packageForm.elements.subtitle.value = pkg?.subtitle || '';
-  refs.packageForm.elements.version.value = pkg?.version || '1.0.0';
-  refs.packageForm.elements.unlockRank.value = pkg?.unlockRank || 'cadet';
-  refs.packageForm.elements.accent.value = pkg?.theme?.accent || '#72f6d5';
-  refs.packageForm.elements.glow.value = pkg?.theme?.glow || '#6da9ff';
-  refs.packageForm.elements.description.value = pkg?.description || '';
-  refs.packageForm.elements.airports.value = JSON.stringify(pkg?.datasets?.airports || [], null, 2);
-  refs.packageForm.elements.routes.value = JSON.stringify(pkg?.datasets?.routes || [], null, 2);
-  refs.packageForm.elements.scenarios.value = JSON.stringify(pkg?.datasets?.scenarios || [], null, 2);
-  state.coverImage = pkg?.coverImage || '';
-  state.editingPackageId = pkg?.id || null;
-};
-
-const clearEditor = () => {
-  refs.packageForm.reset();
-  refs.packageForm.elements.version.value = '1.0.0';
-  refs.packageForm.elements.unlockRank.value = 'cadet';
-  refs.packageForm.elements.accent.value = '#72f6d5';
-  refs.packageForm.elements.glow.value = '#6da9ff';
-  refs.packageForm.elements.airports.value = '[]';
-  refs.packageForm.elements.routes.value = '[]';
-  refs.packageForm.elements.scenarios.value = '[]';
-  refs.editorTitle.textContent = 'Novo pacote';
-  refs.editorTag.textContent = 'JSON validado no save';
-  state.coverImage = '';
-  state.editingPackageId = null;
-};
-
-const bootCatalog = async () => {
-  await state.contentManager.loadCatalog();
-  state.catalog = state.contentManager.catalog;
-  renderStats();
-  renderPackages();
-  renderConfig();
-};
+const readFileAsJson = async (file) => JSON.parse(await file.text());
+const readFileAsDataUrl = async (file) => new Promise((resolve, reject) => {
+  const reader = new FileReader();
+  reader.onload = () => resolve(reader.result);
+  reader.onerror = reject;
+  reader.readAsDataURL(file);
+});
 
 refs.loginForm.addEventListener('submit', (event) => {
   event.preventDefault();
-  const formData = new FormData(refs.loginForm);
-  const credentials = getAdminCredentials();
-  const valid =
-    String(formData.get('username') || '').trim() === credentials.username &&
-    String(formData.get('password') || '') === credentials.password;
-
-  if (!valid) {
-    toast('Credenciais inválidas.', 'danger');
-    return;
+  const form = new FormData(refs.loginForm);
+  const auth = getAuth();
+  if (form.get('username') === auth.username && form.get('password') === auth.password) {
+    setSession(true);
+    setWorkspaceVisibility(true);
+    refreshAll();
+    showToast('Admin liberado.');
+  } else {
+    showToast('Credenciais inválidas.', 'danger');
   }
-
-  setAuthState(true);
-  bootCatalog();
-  toast('Admin liberado.');
 });
 
 refs.logoutButton.addEventListener('click', () => {
-  setAuthState(false);
+  setSession(false);
+  setWorkspaceVisibility(false);
 });
 
-refs.credentialForm.addEventListener('submit', (event) => {
-  event.preventDefault();
-  const formData = new FormData(refs.credentialForm);
-  const credentials = {
-    username: String(formData.get('username') || '').trim(),
-    password: String(formData.get('password') || '')
-  };
-  if (!credentials.username || !credentials.password) {
-    toast('Preencha usuário e senha.', 'warning');
-    return;
-  }
-  saveAdminCredentials(credentials);
-  toast('Credenciais locais atualizadas.');
-  refs.credentialForm.reset();
-});
-
-refs.packageGrid.addEventListener('click', (event) => {
-  const cloneButton = event.target.closest('[data-package-clone]');
-  const toggleButton = event.target.closest('[data-package-toggle]');
-  const deleteButton = event.target.closest('[data-package-delete]');
-  const exportButton = event.target.closest('[data-package-export]');
-
-  if (cloneButton) {
-    const pkg = state.contentManager.getAllPackages().find((item) => item.id === cloneButton.dataset.packageClone);
-    if (!pkg) return;
-    const clone = JSON.parse(JSON.stringify(pkg));
-    if (pkg.origin !== 'custom') {
-      clone.id = `${pkg.id}_clone`;
-      clone.title = `${pkg.title} Copy`;
-      clone.origin = 'custom';
-    }
-    fillEditor(clone);
-    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-    return;
-  }
-
-  if (toggleButton) {
-    const packageId = toggleButton.dataset.packageToggle;
-    const active = (state.profile.activePackages || []).includes(packageId);
-    state.profile = togglePackageForProfile(state.profile, packageId, !active);
-    saveProfile(state.profile);
-    renderStats();
-    renderPackages();
-    toast(active ? 'Pacote desativado no perfil atual.' : 'Pacote ativado no perfil atual.');
-    return;
-  }
-
-  if (deleteButton) {
-    state.contentManager.deleteCustomPackage(deleteButton.dataset.packageDelete);
-    bootCatalog();
-    clearEditor();
-    toast('Pacote custom removido.');
-    return;
-  }
-
-  if (exportButton) {
-    const pkg = state.contentManager.getAllPackages().find((item) => item.id === exportButton.dataset.packageExport);
-    if (!pkg) return;
-    createDownload(`${pkg.id}.json`, pkg);
-  }
-});
-
-refs.loadTemplateButton.addEventListener('click', () => {
-  fillEditor(state.contentManager.getSampleTemplate());
-  toast('Template carregado no editor.');
-});
-
-refs.clearEditorButton.addEventListener('click', () => {
-  clearEditor();
-});
-
-refs.coverImageInput.addEventListener('change', async (event) => {
-  const file = event.target.files?.[0];
+refs.coverImageInput.addEventListener('change', async () => {
+  const [file] = refs.coverImageInput.files || [];
   if (!file) return;
-  state.coverImage = await readFileAsDataUrl(file);
-  toast('Imagem de cover carregada.');
+  coverDataUrl = await readFileAsDataUrl(file);
+  showToast('Cover carregada.');
 });
 
 refs.packageForm.addEventListener('submit', async (event) => {
   event.preventDefault();
   try {
-    const formData = new FormData(refs.packageForm);
-    const baseData = sanitizeEditorData(formData);
+    const form = new FormData(refs.packageForm);
     const pkg = {
-      ...baseData,
-      type: 'dlc',
-      coverImage: state.coverImage,
+      id: String(form.get('id')).trim(),
+      title: String(form.get('title')).trim(),
+      subtitle: String(form.get('subtitle')).trim(),
+      version: String(form.get('version')).trim() || '1.0.0',
+      type: 'custom',
+      unlockRank: form.get('unlockRank'),
+      enabledByDefault: false,
+      description: String(form.get('description')).trim(),
+      theme: {
+        accent: form.get('accent'),
+        glow: form.get('glow'),
+        surface: '#11203c'
+      },
+      coverImage: coverDataUrl,
       datasets: {
-        airports: JSON.parse(String(formData.get('airports') || '[]')),
-        routes: JSON.parse(String(formData.get('routes') || '[]')),
-        scenarios: JSON.parse(String(formData.get('scenarios') || '[]'))
+        airports: parseArray(form.get('airports'), 'Aeroportos'),
+        routes: parseArray(form.get('routes'), 'Rotas'),
+        scenarios: parseArray(form.get('scenarios'), 'Cenários')
       }
     };
-    state.contentManager.saveCustomPackage(pkg);
-    await bootCatalog();
-    fillEditor(pkg);
-    toast('Pacote salvo com sucesso.');
+    if (!pkg.id || !pkg.title) throw new Error('ID e título são obrigatórios.');
+    contentManager.upsertCustomPackage(pkg);
+    fillForm();
+    await refreshAll();
+    showToast(editingPackageId ? 'Pacote atualizado.' : 'Pacote salvo.');
   } catch (error) {
-    console.error(error);
-    toast(`Falha ao salvar pacote: ${error.message}`, 'danger');
+    showToast(error.message, 'danger');
   }
 });
 
-refs.importPackageInput.addEventListener('change', async (event) => {
-  const file = event.target.files?.[0];
-  if (!file) return;
-  try {
-    const text = await readFileAsText(file);
-    const payload = JSON.parse(text);
-    if (payload.customPackages || payload.gameConfig) {
-      state.contentManager.importState(payload);
-      await bootCatalog();
-      toast('Estado importado para o Admin.');
-      return;
-    }
-    fillEditor(payload);
-    toast('Pacote importado no editor.');
-  } catch (error) {
-    toast('Arquivo JSON inválido.', 'danger');
+refs.adminPackageGrid.addEventListener('click', async (event) => {
+  const cloneId = event.target.closest('[data-clone]')?.dataset.clone;
+  const exportId = event.target.closest('[data-export]')?.dataset.export;
+  const deleteId = event.target.closest('[data-delete]')?.dataset.delete;
+  const packageList = contentManager.getAllPackages();
+  if (cloneId) {
+    const pkg = packageList.find((entry) => entry.id === cloneId);
+    if (!pkg) return;
+    const editable = pkg.builtIn ? { ...pkg, id: `${pkg.id}_copy`, title: `${pkg.title} Copy`, builtIn: false } : pkg;
+    fillForm(editable);
+    showToast(pkg.builtIn ? 'Built-in carregado para clonagem.' : 'Pacote carregado no editor.');
+  }
+  if (exportId) {
+    const pkg = packageList.find((entry) => entry.id === exportId);
+    if (!pkg) return;
+    downloadJson(`${pkg.id}.json`, pkg);
+  }
+  if (deleteId) {
+    contentManager.removeCustomPackage(deleteId);
+    await refreshAll();
+    showToast('Pacote removido.', 'warning');
   }
 });
 
-refs.importStateInput.addEventListener('change', async (event) => {
-  const file = event.target.files?.[0];
-  if (!file) return;
-  try {
-    const text = await readFileAsText(file);
-    state.contentManager.importState(JSON.parse(text));
-    await bootCatalog();
-    toast('Estado completo importado.');
-  } catch (error) {
-    toast('Não foi possível importar o estado.', 'danger');
-  }
-});
-
+refs.clearEditorButton.addEventListener('click', () => fillForm());
 refs.exportStateButton.addEventListener('click', () => {
-  createDownload('skyflow-admin-state.json', state.contentManager.exportState());
+  downloadJson('skyflow-admin-state.json', {
+    auth: getAuth(),
+    config: contentManager.getConfig(),
+    customPackages: contentManager.getCustomPackages()
+  });
 });
-
+refs.importStateInput.addEventListener('change', async () => {
+  const [file] = refs.importStateInput.files || [];
+  if (!file) return;
+  try {
+    const data = await readFileAsJson(file);
+    if (data.auth) storage.set(AUTH_KEY, data.auth);
+    if (data.config) contentManager.saveConfig(data.config);
+    if (Array.isArray(data.customPackages)) contentManager.saveCustomPackages(data.customPackages);
+    await refreshAll();
+    showToast('Estado importado.');
+  } catch (error) {
+    showToast(`Falha ao importar: ${error.message}`, 'danger');
+  }
+});
+refs.importPackageInput.addEventListener('change', async () => {
+  const [file] = refs.importPackageInput.files || [];
+  if (!file) return;
+  try {
+    const pkg = await readFileAsJson(file);
+    contentManager.upsertCustomPackage(pkg);
+    await refreshAll();
+    showToast('Pacote importado.');
+  } catch (error) {
+    showToast(`Erro no pacote: ${error.message}`, 'danger');
+  }
+});
+refs.loadTemplateButton.addEventListener('click', () => {
+  fillForm({
+    id: 'custom_global_lane',
+    title: 'Custom Global Lane',
+    subtitle: 'Expansão personalizada',
+    version: '1.0.0',
+    unlockRank: 'cadet',
+    description: 'Pacote criado pelo painel Admin.',
+    theme: { accent: '#72f6d5', glow: '#6da9ff' },
+    datasets: {
+      airports: [{ id: 'MAD', iata: 'MAD', name: 'Adolfo Suárez Madrid-Barajas', city: 'Madrid', country: 'Spain', lat: 40.4983, lon: -3.5676, traffic: 0.92 }],
+      routes: [{ id: 'mad-lhr', from: 'MAD', to: 'LHR', difficulty: 0.92 }],
+      scenarios: [{ id: 'iberia_flow', title: 'Fluxo Ibérico', blurb: 'Briefing curto para validar pacote custom.', difficulty: 'Médio', maxActive: 4, targetScore: 780, duration: 160, spawnInterval: 5.5, rankRequired: 'cadet' }]
+    }
+  });
+  showToast('Template carregado no editor.');
+});
 refs.configForm.addEventListener('submit', (event) => {
   event.preventDefault();
-  const formData = new FormData(refs.configForm);
-  const config = {
-    defaultPilotName: String(formData.get('defaultPilotName') || DEFAULT_GAME_CONFIG.defaultPilotName),
-    starterCredits: Number(formData.get('starterCredits') || DEFAULT_GAME_CONFIG.starterCredits),
-    baseSpawnInterval: Number(formData.get('baseSpawnInterval') || DEFAULT_GAME_CONFIG.baseSpawnInterval),
-    baseConflictRadius: Number(formData.get('baseConflictRadius') || DEFAULT_GAME_CONFIG.baseConflictRadius),
-    sessionDuration: Number(formData.get('sessionDuration') || DEFAULT_GAME_CONFIG.sessionDuration),
-    scorePerLanding: Number(formData.get('scorePerLanding') || DEFAULT_GAME_CONFIG.scorePerLanding)
-  };
-  storage.set(STORAGE_KEYS.GAME_CONFIG, config);
-  toast('Configuração global salva.');
+  const form = new FormData(refs.configForm);
+  const config = Object.fromEntries([...form.entries()].map(([key, value]) => [key, Number.isNaN(Number(value)) || value === '' ? value : Number(value)]));
+  contentManager.saveConfig(config);
+  refreshAll();
+  showToast('Configuração global salva.');
+});
+refs.credentialForm.addEventListener('submit', (event) => {
+  event.preventDefault();
+  const form = new FormData(refs.credentialForm);
+  storage.set(AUTH_KEY, { username: form.get('username'), password: form.get('password') });
+  showToast('Credenciais atualizadas.');
 });
 
-const init = async () => {
-  saveAdminCredentials(getAdminCredentials());
-  const authenticated = sessionStorage.getItem(ADMIN_SESSION_KEY) === '1';
-  setAuthState(authenticated);
-  if (authenticated) {
-    await bootCatalog();
-  }
-  clearEditor();
-};
-
-init().catch((error) => {
-  console.error(error);
-  toast('Falha ao iniciar o Admin.', 'danger');
-});
+(async () => {
+  await contentManager.loadCatalog();
+  fillForm();
+  setWorkspaceVisibility(isLoggedIn());
+  if (isLoggedIn()) refreshAll();
+})();

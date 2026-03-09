@@ -57,14 +57,14 @@ export class SimulationEngine {
       timeRemaining: scenario.duration || this.config.sessionDuration,
       scenarioTitle: scenario.title
     };
-    const initialFlights = Math.min(Math.max(2, Math.floor((scenario.maxActive || 4) * 0.5)), 4);
+    const initialFlights = Math.min(Math.max(2, Math.floor((scenario.maxActive || 4) * 0.42)), 3);
     for (let i = 0; i < initialFlights; i += 1) this.spawnFlight(true);
   }
 
   getSpawnInterval() {
     const base = this.scenario.spawnInterval || this.config.baseSpawnInterval || 6.4;
     const pressure = this.session ? clamp((100 - this.session.calm) / 100, 0, 0.25) : 0;
-    return Math.max(3.25, base + pressure * 1.2);
+    return Math.max(4.6, base + pressure * 1.35);
   }
 
   pauseToggle() {
@@ -101,10 +101,10 @@ export class SimulationEngine {
     const route = this.routes[Math.floor(Math.random() * this.routes.length)];
     if (!route) return;
     const routeState = this.buildRouteState(route);
-    const altitude = 250 + Math.floor(rand(0, 12)) * 10;
-    const speed = rand(0.82, 1.08);
-    const progress = isInitial ? rand(0.06, 0.24) : rand(0.01, 0.08);
-    const lateralOffset = rand(-2.2, 2.2);
+    const altitude = 240 + Math.floor(rand(0, 14)) * 10;
+    const speed = rand(0.78, 1.04);
+    const progress = isInitial ? rand(0.04, 0.18) : rand(0.01, 0.05);
+    const lateralOffset = rand(-1.4, 1.4);
     this.flights.push({
       id: makeFlightId(),
       callsign: makeCallsign(),
@@ -116,10 +116,10 @@ export class SimulationEngine {
       targetAltitude: altitude,
       altitude,
       verticalSpeed: 0,
-      baseDuration: rand(82, 132) * (route.difficulty || 1),
+      baseDuration: rand(96, 148) * (route.difficulty || 1),
       holdTimer: 0,
       lateralOffset,
-      lateralVelocity: rand(-0.25, 0.25),
+      lateralVelocity: rand(-0.14, 0.14),
       priority: false,
       warning: false,
       conflict: false,
@@ -183,12 +183,12 @@ export class SimulationEngine {
 
     if (flight.holdTimer > 0) {
       flight.holdTimer = Math.max(0, flight.holdTimer - dt);
-      flight.progress += dt * 0.0012;
-      flight.lateralOffset += Math.sin(this.time * 2.5 + flight.progress * 14) * dt * 1.4;
+      flight.progress += dt * 0.001;
+      flight.lateralOffset += Math.sin(this.time * 2.1 + flight.progress * 12) * dt * 0.8;
     } else {
       flight.progress += (dt / flight.baseDuration) * flight.speed * priorityBoost;
-      flight.lateralOffset = clamp(flight.lateralOffset + flight.lateralVelocity * dt, -14, 14);
-      flight.lateralVelocity *= 0.96;
+      flight.lateralOffset = clamp(flight.lateralOffset + flight.lateralVelocity * dt, -10, 10);
+      flight.lateralVelocity *= 0.94;
     }
 
     const pos = routePosition(flight.routeState, flight.progress, flight.lateralOffset);
@@ -199,8 +199,8 @@ export class SimulationEngine {
   }
 
   evaluateConflicts() {
-    const conflictDistance = 10.5;
-    const warningDistance = 18.5;
+    const conflictDistance = 8.2;
+    const warningDistance = 14.8;
     let conflictCount = 0;
     let warningCount = 0;
 
@@ -245,7 +245,7 @@ export class SimulationEngine {
     } else if (warningCount > 0) {
       this.session.warnings += warningCount * 0.03;
       this.session.calm = clamp(this.session.calm - warningCount * 0.06, 0, 100);
-      this.emit('warning', 'Tráfego em aproximação crítica sob monitoramento.', 3.2);
+      this.emit('warning', 'Atenção: separação abaixo do ideal em monitoramento.', 5.4);
     } else {
       this.session.calm = clamp(this.session.calm + 0.075, 0, 100);
     }

@@ -956,3 +956,95 @@ textarea {
   border: 1px solid var(--line-soft);
   background: linear-gradient(180deg, rgba(12, 22, 42, 0.85), rgba(7, 14, 28, 0.88));
 }
+
+
+/* build 1.2.0 radar refinement */
+.world-stage {
+  background: radial-gradient(circle at 50% 48%, rgba(20, 55, 104, 0.2), transparent 44%), linear-gradient(180deg, rgba(3, 10, 20, 0.42), rgba(5, 10, 18, 0.16));
+}
+
+.airport-label,
+.flight-tag {
+  font-size: 0.52rem;
+  letter-spacing: 0.06em;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.airport-miniature {
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
+.airport-pulse,
+.airport-ring,
+.airport-core {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+}
+
+.airport-pulse {
+  inset: -0.35rem;
+  background: radial-gradient(circle, rgba(114, 246, 213, 0.18), rgba(114, 246, 213, 0));
+  opacity: calc(0.72 * var(--airport-glow, 1));
+}
+
+.airport-ring {
+  inset: 0.1rem;
+  border: 1px solid rgba(114,246,213,0.34);
+  box-shadow: 0 0 14px rgba(109,169,255,0.16);
+}
+
+.airport-core {
+  inset: 0.37rem;
+  background: linear-gradient(180deg, rgba(220,242,255,0.95), rgba(88,146,210,0.82));
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.12), 0 0 16px rgba(114,246,213,0.28);
+}
+
+.airport-platform, .airport-terminal, .airport-tower, .airport-beacon { display: none; }
+
+.flight-body-shell {
+  width: 1.05rem;
+  height: 2rem;
+}
+
+.flight-vector {
+  position: absolute;
+  left: 50%;
+  top: -1rem;
+  width: 1px;
+  height: 1rem;
+  transform: translateX(-50%);
+  background: linear-gradient(180deg, rgba(114,246,213,0), rgba(114,246,213,0.4));
+}
+
+.flight-body-core {
+  top: 0.28rem;
+  width: 0.28rem;
+  height: 1.05rem;
+  background: linear-gradient(180deg, rgba(247,250,255,0.98), rgba(114,246,213,0.72));
+}
+
+.flight-wing {
+  top: 0.82rem;
+  width: 0.88rem;
+  height: 0.11rem;
+}
+
+.flight-wing.wing-b { display: none; }
+
+.flight-tail {
+  top: 0.14rem;
+  width: 0.18rem;
+  height: 0.26rem;
+}
+
+.flight-glow {
+  inset: 0.22rem 0.12rem;
+  box-shadow: 0 0 14px rgba(109, 169, 255, 0.24);
+}
+
+.toast-layer {
+  width: min(20rem, calc(100vw - 2rem));
+}

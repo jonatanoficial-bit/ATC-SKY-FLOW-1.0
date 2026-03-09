@@ -2,9 +2,9 @@
 
 ## Build atual
 
-- versão: `1.1.0`
-- build local: `09/03/2026 20:56:42`
-- build UTC: `2026-03-09 20:56:42 UTC`
+- versão: `1.2.0`
+- build local: `09/03/2026 21:45:00`
+- build UTC: `2026-03-09 21:45:00 UTC`
 - conclusão desta entrega: `96%`
 - correções e melhorias incluídas: `modal corrigido, jogabilidade refinada, mapa redesenhado e aeronaves retrabalhadas`
 

@@ -9,6 +9,10 @@ html {
   scroll-behavior: smooth;
 }
 
+[hidden] {
+  display: none !important;
+}
+
 body {
   margin: 0;
   min-height: 100vh;
@@ -905,4 +909,33 @@ textarea {
     transition: none !important;
     scroll-behavior: auto !important;
   }
+}
+
+.build-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 2rem;
+  padding: 0.5rem 0.8rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(8,15,28,0.54);
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+
+.build-panel {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  margin-top: 0.25rem;
+}
+
+.build-meta-card {
+  padding: 0.9rem 1rem;
+  border-radius: 1.2rem;
+  border: 1px solid var(--line-soft);
+  background: linear-gradient(180deg, rgba(12, 22, 42, 0.85), rgba(7, 14, 28, 0.88));
 }

@@ -19,7 +19,9 @@ const refs = {
   configForm: document.getElementById('configForm'),
   coverImageInput: document.getElementById('coverImageInput'),
   credentialForm: document.getElementById('credentialForm'),
-  toastLayer: document.getElementById('adminToastLayer')
+  toastLayer: document.getElementById('adminToastLayer'),
+  adminBuildChip: document.getElementById('adminBuildChip'),
+  adminCompletionChip: document.getElementById('adminCompletionChip')
 };
 
 const contentManager = new ContentManager('./content');
@@ -27,6 +29,18 @@ const AUTH_KEY = 'skyflow.admin.auth.v1';
 const SESSION_KEY = 'skyflow.admin.session.v1';
 let editingPackageId = null;
 let coverDataUrl = '';
+
+
+const applyBuildInfo = async () => {
+  try {
+    const info = await fetch('./build-info.json', { cache: 'no-store' }).then((res) => res.json());
+    if (refs.adminBuildChip) refs.adminBuildChip.textContent = `Build: ${info.buildLocal}`;
+    if (refs.adminCompletionChip) refs.adminCompletionChip.textContent = `Conclusão: ${info.completion}`;
+  } catch {
+    if (refs.adminBuildChip) refs.adminBuildChip.textContent = 'Build: indisponível';
+    if (refs.adminCompletionChip) refs.adminCompletionChip.textContent = 'Conclusão: n/d';
+  }
+};
 
 const showToast = (message, type = 'info') => {
   const toast = document.createElement('article');
@@ -283,6 +297,7 @@ refs.credentialForm.addEventListener('submit', (event) => {
 
 (async () => {
   await contentManager.loadCatalog();
+  await applyBuildInfo();
   fillForm();
   setWorkspaceVisibility(isLoggedIn());
   if (isLoggedIn()) refreshAll();

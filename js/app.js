@@ -23,6 +23,8 @@ const refs = {
   heroDuration: document.getElementById('heroDuration'),
   heroActivePackages: document.getElementById('heroActivePackages'),
   packageGrid: document.getElementById('packageGrid'),
+  buildChip: document.getElementById('buildChip'),
+  completionChip: document.getElementById('completionChip'),
   contentStatusTag: document.getElementById('contentStatusTag'),
   sfxToggle: document.getElementById('sfxToggle'),
   motionToggle: document.getElementById('motionToggle'),
@@ -58,6 +60,18 @@ const state = {
   uiAccumulator: 0,
   modalOpen: false,
   lastFrame: 0
+};
+
+
+const applyBuildInfo = async () => {
+  try {
+    const info = await fetch('./build-info.json', { cache: 'no-store' }).then((res) => res.json());
+    if (refs.buildChip) refs.buildChip.textContent = `Build: ${info.buildLocal}`;
+    if (refs.completionChip) refs.completionChip.textContent = `Conclusão: ${info.completion}`;
+  } catch {
+    if (refs.buildChip) refs.buildChip.textContent = 'Build: indisponível';
+    if (refs.completionChip) refs.completionChip.textContent = 'Conclusão: n/d';
+  }
 };
 
 const showToast = (message, type = 'info') => {
@@ -232,7 +246,7 @@ const boot = async () => {
     },
     onSelectAirport: (airport) => showToast(`${airport.iata} · ${airport.city}, ${airport.country}`)
   });
-  await Promise.all([reloadContent(), state.mapRenderer.init()]);
+  await Promise.all([reloadContent(), state.mapRenderer.init(), applyBuildInfo()]);
   refs.pauseButton.disabled = true;
   if ('serviceWorker' in navigator && location.protocol !== 'file:') {
     navigator.serviceWorker.register('./service-worker.js').catch(() => {});

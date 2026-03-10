@@ -181,6 +181,20 @@ const defaultProfile = {
   unlockedRank: 'cadet'
 };
 
+
+async function clearLegacyCaches() {
+  try {
+    if ('serviceWorker' in navigator) {
+      const regs = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(regs.map((reg) => reg.unregister()));
+    }
+    if ('caches' in window) {
+      const keys = await caches.keys();
+      await Promise.all(keys.filter((key) => key.startsWith('skyflow-cache')).map((key) => caches.delete(key)));
+    }
+  } catch {}
+}
+
 const state = {
   profile: loadProfile(),
   airports: [],
@@ -625,6 +639,7 @@ function renderAll() {
 }
 
 async function init() {
+  await clearLegacyCaches();
   await loadData();
   await renderBuildInfo();
   wireEvents();

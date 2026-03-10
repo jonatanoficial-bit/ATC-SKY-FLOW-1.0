@@ -1,11 +1,10 @@
 {
-  "version": "2.1.0",
-  "buildLocal": "10/03/2026 13:01:02",
+  "version": "2.1.1",
+  "buildLocal": "10/03/2026 18:35:00",
   "completion": "99%",
   "notes": [
-    "local radar by airport",
-    "bilingual radio typewriter",
-    "icao-inspired aircraft models",
-    "major real-world hubs"
+    "radar firefox compatibility fix",
+    "aircraft markers restored",
+    "service worker cache reset"
   ]
 }

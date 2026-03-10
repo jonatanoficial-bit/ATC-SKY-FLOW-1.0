@@ -1,3 +1,9 @@
+## Build 2.1.1
+
+- Firefox/Vercel radar compatibility fix
+- aircraft markers restored
+- stale service worker cache disabled
+
 # SkyFlow Control
 
 Build atual: **2.1.0**  

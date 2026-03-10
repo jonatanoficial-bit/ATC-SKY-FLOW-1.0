@@ -994,3 +994,40 @@ button {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+.aircraft-marker {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  translate: none;
+  display: grid;
+  align-items: center;
+  justify-items: center;
+  gap: 0.24rem;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  z-index: 4;
+}
+.aircraft-blip {
+  position: absolute;
+  width: 0.9rem;
+  height: 0.9rem;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(255,255,255,0.96) 0%, rgba(125,241,207,0.98) 54%, rgba(125,241,207,0.10) 100%);
+  box-shadow: 0 0 14px rgba(125,241,207,0.75), 0 0 26px rgba(78,151,255,0.35);
+}
+.aircraft-model {
+  position: absolute;
+  width: 1.95rem;
+  height: 1.95rem;
+  left: 50%;
+  top: 50%;
+  display: inline-grid;
+  place-items: center;
+  pointer-events: none;
+}
+.aircraft-tag {
+  position: relative;
+  margin-top: 1.6rem;
+}
+.marker-layer { overflow: visible; }

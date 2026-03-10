@@ -1,11 +1,8 @@
 [
-  {"id":"jfk-lhr","from":"JFK","to":"LHR","difficulty":1.2},
-  {"id":"jfk-gru","from":"JFK","to":"GRU","difficulty":1.0},
-  {"id":"lhr-cdg","from":"LHR","to":"CDG","difficulty":0.8},
-  {"id":"lhr-dxb","from":"LHR","to":"DXB","difficulty":1.15},
-  {"id":"cdg-dxb","from":"CDG","to":"DXB","difficulty":1.0},
-  {"id":"gru-dxb","from":"GRU","to":"DXB","difficulty":1.2},
-  {"id":"dxb-sin","from":"DXB","to":"SIN","difficulty":1.0},
-  {"id":"sin-hnd","from":"SIN","to":"HND","difficulty":1.1},
-  {"id":"hnd-syd","from":"HND","to":"SYD","difficulty":1.15}
+  { "airportId": "GRU", "name": "MOPAR 1A", "type": "STAR" },
+  { "airportId": "JFK", "name": "CAMRN 4", "type": "STAR" },
+  { "airportId": "LHR", "name": "BIG 1A", "type": "STAR" },
+  { "airportId": "DXB", "name": "EMIVO 1B", "type": "STAR" },
+  { "airportId": "HND", "name": "KAIHO 2A", "type": "STAR" },
+  { "airportId": "FRA", "name": "PSA 1F", "type": "STAR" }
 ]

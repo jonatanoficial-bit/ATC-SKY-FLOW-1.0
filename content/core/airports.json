@@ -1,10 +1,141 @@
 [
-  {"id":"JFK","iata":"JFK","name":"John F. Kennedy International","city":"New York","country":"USA","lat":40.6413,"lon":-73.7781,"traffic":1.25},
-  {"id":"LHR","iata":"LHR","name":"Heathrow","city":"London","country":"UK","lat":51.47,"lon":-0.4543,"traffic":1.3},
-  {"id":"CDG","iata":"CDG","name":"Charles de Gaulle","city":"Paris","country":"France","lat":49.0097,"lon":2.5479,"traffic":1.1},
-  {"id":"GRU","iata":"GRU","name":"Guarulhos","city":"Sao Paulo","country":"Brazil","lat":-23.4356,"lon":-46.4731,"traffic":1.05},
-  {"id":"DXB","iata":"DXB","name":"Dubai International","city":"Dubai","country":"UAE","lat":25.2532,"lon":55.3657,"traffic":1.2},
-  {"id":"HND","iata":"HND","name":"Haneda","city":"Tokyo","country":"Japan","lat":35.5494,"lon":139.7798,"traffic":1.35},
-  {"id":"SIN","iata":"SIN","name":"Changi","city":"Singapore","country":"Singapore","lat":1.3644,"lon":103.9915,"traffic":1.1},
-  {"id":"SYD","iata":"SYD","name":"Sydney","city":"Sydney","country":"Australia","lat":-33.9399,"lon":151.1753,"traffic":0.95}
+  {
+    "id": "GRU",
+    "iata": "GRU",
+    "icao": "SBGR",
+    "name": "São Paulo Guarulhos",
+    "city": "São Paulo",
+    "country": "Brasil",
+    "traffic": 1.08,
+    "trafficLabel": "Alto",
+    "tmaRadiusNm": 60,
+    "unlockRank": "cadet",
+    "description": "Hub brasileiro com duas pistas paralelas, aproximações pelo norte e saídas distribuídas entre leste e sul.",
+    "runways": [
+      { "id": "10L/28R", "heading": 100, "oppositeHeading": 280, "visualLength": 58 },
+      { "id": "10R/28L", "heading": 100, "oppositeHeading": 280, "visualLength": 52 }
+    ],
+    "fixes": [
+      { "name": "MOPAR", "bearing": 330, "distanceNm": 52, "type": "arrival" },
+      { "name": "BAVIN", "bearing": 45, "distanceNm": 49, "type": "arrival" },
+      { "name": "SISDE", "bearing": 180, "distanceNm": 54, "type": "arrival" },
+      { "name": "UGREX", "bearing": 110, "distanceNm": 46, "type": "departure" },
+      { "name": "NAXOV", "bearing": 225, "distanceNm": 51, "type": "departure" }
+    ]
+  },
+  {
+    "id": "JFK",
+    "iata": "JFK",
+    "icao": "KJFK",
+    "name": "John F. Kennedy International",
+    "city": "New York",
+    "country": "EUA",
+    "traffic": 1.2,
+    "trafficLabel": "Muito alto",
+    "tmaRadiusNm": 62,
+    "unlockRank": "cadet",
+    "description": "Grande hub costeiro com chegadas oceânicas e forte mistura de operações domésticas e internacionais.",
+    "runways": [
+      { "id": "04L/22R", "heading": 44, "oppositeHeading": 224, "visualLength": 54 },
+      { "id": "13L/31R", "heading": 134, "oppositeHeading": 314, "visualLength": 56 }
+    ],
+    "fixes": [
+      { "name": "CAMRN", "bearing": 320, "distanceNm": 50, "type": "arrival" },
+      { "name": "ROBER", "bearing": 40, "distanceNm": 53, "type": "arrival" },
+      { "name": "HAARP", "bearing": 115, "distanceNm": 48, "type": "departure" },
+      { "name": "MERIT", "bearing": 208, "distanceNm": 58, "type": "departure" }
+    ]
+  },
+  {
+    "id": "LHR",
+    "iata": "LHR",
+    "icao": "EGLL",
+    "name": "Heathrow",
+    "city": "London",
+    "country": "Reino Unido",
+    "traffic": 1.28,
+    "trafficLabel": "Muito alto",
+    "tmaRadiusNm": 58,
+    "unlockRank": "controller",
+    "description": "Fluxo muito denso com pistas paralelas e gerenciamento fino de spacing em final.",
+    "runways": [
+      { "id": "09L/27R", "heading": 90, "oppositeHeading": 270, "visualLength": 60 },
+      { "id": "09R/27L", "heading": 90, "oppositeHeading": 270, "visualLength": 54 }
+    ],
+    "fixes": [
+      { "name": "BIG", "bearing": 100, "distanceNm": 48, "type": "arrival" },
+      { "name": "LAM", "bearing": 40, "distanceNm": 45, "type": "arrival" },
+      { "name": "OCK", "bearing": 240, "distanceNm": 47, "type": "arrival" },
+      { "name": "DET", "bearing": 300, "distanceNm": 50, "type": "departure" }
+    ]
+  },
+  {
+    "id": "DXB",
+    "iata": "DXB",
+    "icao": "OMDB",
+    "name": "Dubai International",
+    "city": "Dubai",
+    "country": "EAU",
+    "traffic": 1.18,
+    "trafficLabel": "Muito alto",
+    "tmaRadiusNm": 62,
+    "unlockRank": "controller",
+    "description": "Operação de alto volume no deserto, com longas finais e intensa mistura de widebodies.",
+    "runways": [
+      { "id": "12L/30R", "heading": 120, "oppositeHeading": 300, "visualLength": 58 },
+      { "id": "12R/30L", "heading": 120, "oppositeHeading": 300, "visualLength": 54 }
+    ],
+    "fixes": [
+      { "name": "EMIVO", "bearing": 35, "distanceNm": 54, "type": "arrival" },
+      { "name": "RANIN", "bearing": 305, "distanceNm": 50, "type": "arrival" },
+      { "name": "IMDAX", "bearing": 180, "distanceNm": 58, "type": "departure" },
+      { "name": "SENPA", "bearing": 100, "distanceNm": 46, "type": "departure" }
+    ]
+  },
+  {
+    "id": "HND",
+    "iata": "HND",
+    "icao": "RJTT",
+    "name": "Tokyo Haneda",
+    "city": "Tokyo",
+    "country": "Japão",
+    "traffic": 1.24,
+    "trafficLabel": "Muito alto",
+    "tmaRadiusNm": 58,
+    "unlockRank": "director",
+    "description": "Hub altamente eficiente com múltiplos eixos e tráfego intenso de chegadas domésticas.",
+    "runways": [
+      { "id": "16L/34R", "heading": 160, "oppositeHeading": 340, "visualLength": 58 },
+      { "id": "16R/34L", "heading": 160, "oppositeHeading": 340, "visualLength": 54 }
+    ],
+    "fixes": [
+      { "name": "KAIHO", "bearing": 65, "distanceNm": 47, "type": "arrival" },
+      { "name": "ADDUM", "bearing": 310, "distanceNm": 51, "type": "arrival" },
+      { "name": "Y20", "bearing": 200, "distanceNm": 45, "type": "departure" },
+      { "name": "EDOGR", "bearing": 135, "distanceNm": 52, "type": "departure" }
+    ]
+  },
+  {
+    "id": "FRA",
+    "iata": "FRA",
+    "icao": "EDDF",
+    "name": "Frankfurt",
+    "city": "Frankfurt",
+    "country": "Alemanha",
+    "traffic": 1.12,
+    "trafficLabel": "Alto",
+    "tmaRadiusNm": 56,
+    "unlockRank": "director",
+    "description": "Hub europeu com forte disciplina de chegada e vetoração precisa em finais paralelas.",
+    "runways": [
+      { "id": "07L/25R", "heading": 70, "oppositeHeading": 250, "visualLength": 58 },
+      { "id": "07R/25L", "heading": 70, "oppositeHeading": 250, "visualLength": 54 }
+    ],
+    "fixes": [
+      { "name": "PSA", "bearing": 240, "distanceNm": 44, "type": "arrival" },
+      { "name": "TAU", "bearing": 60, "distanceNm": 47, "type": "arrival" },
+      { "name": "RID", "bearing": 330, "distanceNm": 52, "type": "departure" },
+      { "name": "SPY", "bearing": 150, "distanceNm": 50, "type": "departure" }
+    ]
+  }
 ]

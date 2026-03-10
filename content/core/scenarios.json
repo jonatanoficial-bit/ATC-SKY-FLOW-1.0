@@ -1,5 +1,35 @@
 [
-  {"id":"atlantic_briefing","title":"Janela Atlântica","blurb":"Pico de demanda entre Américas e Europa com fluxo executivo e comercial.","difficulty":"Médio","maxActive":5,"targetScore":900,"duration":180,"spawnInterval":5.2,"rankRequired":"cadet"},
-  {"id":"euro_hub_rush","title":"Rush Euro Hub","blurb":"Heathrow e Paris operam saturados com decisões rápidas e vetoração precisa.","difficulty":"Médio+","maxActive":6,"targetScore":1100,"duration":200,"spawnInterval":4.7,"rankRequired":"cadet"},
-  {"id":"desert_bridge","title":"Ponte do Deserto","blurb":"Conecte Europa, Oriente Médio e Ásia com mínima perda de calma operacional.","difficulty":"Avançado","maxActive":7,"targetScore":1400,"duration":220,"spawnInterval":4.3,"rankRequired":"controller"}
+  {
+    "id": "morning_push",
+    "title": "Morning Push",
+    "blurb": "Fluxo inicial equilibrado, ideal para aprender seleção de pista, spacing e vetoração.",
+    "difficulty": "Base",
+    "maxActive": 5,
+    "targetScore": 850,
+    "duration": 180,
+    "spawnInterval": 5.6,
+    "rankRequired": "cadet"
+  },
+  {
+    "id": "bank_arrivals",
+    "title": "Bank de Chegadas",
+    "blurb": "Chegadas concentradas em curto intervalo exigem priorização de final e controle de separação.",
+    "difficulty": "Médio",
+    "maxActive": 6,
+    "targetScore": 1080,
+    "duration": 210,
+    "spawnInterval": 4.8,
+    "rankRequired": "cadet"
+  },
+  {
+    "id": "storm_slot",
+    "title": "Janela Meteorológica",
+    "blurb": "Menos espaço operacional e comandos mais rápidos para manter a calma acima de 60%.",
+    "difficulty": "Avançado",
+    "maxActive": 7,
+    "targetScore": 1380,
+    "duration": 220,
+    "spawnInterval": 4.1,
+    "rankRequired": "controller"
+  }
 ]

@@ -1,5 +1,48 @@
 [
-  {"id":"BOS","iata":"BOS","name":"Logan","city":"Boston","country":"USA","lat":42.3656,"lon":-71.0096,"traffic":0.88},
-  {"id":"DUB","iata":"DUB","name":"Dublin","city":"Dublin","country":"Ireland","lat":53.4273,"lon":-6.2436,"traffic":0.82},
-  {"id":"KEF","iata":"KEF","name":"Keflavik","city":"Reykjavik","country":"Iceland","lat":63.985,"lon":-22.6056,"traffic":0.7}
+  {
+    "id": "CDG",
+    "iata": "CDG",
+    "icao": "LFPG",
+    "name": "Paris Charles de Gaulle",
+    "city": "Paris",
+    "country": "França",
+    "traffic": 1.14,
+    "trafficLabel": "Alto",
+    "tmaRadiusNm": 56,
+    "unlockRank": "controller",
+    "description": "Hub denso do Atlântico Norte com chegadas coordenadas e finais paralelas.",
+    "runways": [
+      { "id": "08L/26R", "heading": 80, "oppositeHeading": 260, "visualLength": 56 },
+      { "id": "08R/26L", "heading": 80, "oppositeHeading": 260, "visualLength": 52 }
+    ],
+    "fixes": [
+      { "name": "OKIPA", "bearing": 55, "distanceNm": 47, "type": "arrival" },
+      { "name": "BANOX", "bearing": 260, "distanceNm": 50, "type": "arrival" },
+      { "name": "PGS", "bearing": 150, "distanceNm": 54, "type": "departure" },
+      { "name": "MOPAR", "bearing": 330, "distanceNm": 46, "type": "departure" }
+    ]
+  },
+  {
+    "id": "AMS",
+    "iata": "AMS",
+    "icao": "EHAM",
+    "name": "Amsterdam Schiphol",
+    "city": "Amsterdam",
+    "country": "Holanda",
+    "traffic": 1.1,
+    "trafficLabel": "Alto",
+    "tmaRadiusNm": 54,
+    "unlockRank": "controller",
+    "description": "Operação europeia de alto fluxo com fortes ondas de chegadas continentais.",
+    "runways": [
+      { "id": "18C/36C", "heading": 180, "oppositeHeading": 360, "visualLength": 58 },
+      { "id": "06/24", "heading": 60, "oppositeHeading": 240, "visualLength": 52 }
+    ],
+    "fixes": [
+      { "name": "ARTIP", "bearing": 70, "distanceNm": 44, "type": "arrival" },
+      { "name": "RIVER", "bearing": 250, "distanceNm": 46, "type": "arrival" },
+      { "name": "SPY", "bearing": 160, "distanceNm": 48, "type": "departure" },
+      { "name": "DENUT", "bearing": 330, "distanceNm": 50, "type": "departure" }
+    ]
+  }
 ]

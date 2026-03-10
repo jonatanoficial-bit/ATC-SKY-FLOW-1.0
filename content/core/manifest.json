@@ -1,12 +1,14 @@
 {
-  "id":"core",
-  "title":"Core Global",
-  "subtitle":"Rede base",
-  "version":"1.0.0",
-  "type":"core",
-  "unlockRank":"cadet",
-  "enabledByDefault":true,
-  "description":"Pacote principal com hubs globais, carreira e briefings iniciais.",
-  "theme":{"accent":"#72f6d5","glow":"#6da9ff","surface":"#0f1830"},
-  "datasets":{"airports":"./airports.json","routes":"./routes.json","scenarios":"./scenarios.json"}
+  "id": "core",
+  "title": "Core Towers",
+  "description": "Pacote base com hubs principais, radar local e janelas operacionais padrão.",
+  "version": "2.0.0",
+  "type": "core",
+  "unlockRank": "cadet",
+  "enabledByDefault": true,
+  "datasets": {
+    "airports": "./airports.json",
+    "routes": "./routes.json",
+    "scenarios": "./scenarios.json"
+  }
 }

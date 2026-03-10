@@ -3,8 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#08111f" />
-    <meta name="description" content="SkyFlow Control — simulador mobile-first de controle de tráfego aéreo com carreira, DLCs e painel Admin local." />
+    <meta name="theme-color" content="#07111d" />
+    <meta
+      name="description"
+      content="SkyFlow Control — simulador mobile-first de controle de tráfego aéreo com radar ATC, aeroportos reais, carreira e DLCs modulares."
+    />
     <title>SkyFlow Control</title>
     <link rel="icon" type="image/svg+xml" href="./assets/branding/favicon.svg" />
     <link rel="manifest" href="./manifest.webmanifest" />
@@ -20,7 +23,7 @@
         <div class="brand-block">
           <img class="brand-logo" src="./assets/branding/logo.svg" alt="SkyFlow Control" />
           <div>
-            <p class="eyebrow">Controle global premium</p>
+            <p class="eyebrow">Controle ATC premium</p>
             <h1>SkyFlow Control</h1>
           </div>
         </div>
@@ -34,47 +37,58 @@
 
       <main class="main-grid">
         <section class="screen active" id="dashboardScreen" aria-labelledby="dashboardTitle">
-          <div class="hero-card glass-panel">
+          <section class="hero-card glass-panel">
             <div class="hero-copy">
-              <p class="eyebrow">Carreira operacional</p>
-              <h2 id="dashboardTitle">Dirija a malha aérea mundial com foco mobile-first.</h2>
+              <p class="eyebrow">Seleção de torre</p>
+              <h2 id="dashboardTitle">Opere uma torre por vez com radar local, rotas reais e progressão de carreira.</h2>
               <p class="hero-text">
-                Controle separações, ajuste altitude, desvie de células meteorológicas e expanda sua rede com DLCs modulares.
+                Escolha um aeroporto, carregue uma janela operacional e controle chegadas e saídas dentro da TMA com leitura clara, comandos rápidos e fluxo jogável.
               </p>
               <div class="hero-actions">
-                <button class="primary-button" id="startScenarioButton" type="button">Iniciar janela</button>
+                <button class="primary-button" id="startScenarioButton" type="button">Iniciar operação</button>
                 <button class="secondary-button" id="openContentButton" type="button">Gerenciar conteúdo</button>
               </div>
             </div>
 
-          <div class="build-panel" aria-label="Metadados da build">
-            <div class="build-chip" id="buildChip">Build: carregando…</div>
-            <div class="build-chip" id="completionChip">Conclusão: --</div>
-          </div>
-
-            <div class="hero-side">
+            <div class="hero-side hero-side-stack">
               <div class="hero-stat-card">
-                <span class="stat-label">Pontuação alvo</span>
-                <strong id="heroTargetScore">—</strong>
+                <span class="stat-label">Aeroporto ativo</span>
+                <strong id="heroAirport">Selecione uma torre</strong>
               </div>
               <div class="hero-stat-card">
-                <span class="stat-label">Duração</span>
-                <strong id="heroDuration">—</strong>
+                <span class="stat-label">Cenário</span>
+                <strong id="heroScenario">Morning Push</strong>
               </div>
               <div class="hero-stat-card">
                 <span class="stat-label">Pacotes ativos</span>
                 <strong id="heroActivePackages">—</strong>
               </div>
             </div>
-          </div>
+          </section>
+
+          <section class="build-row">
+            <div class="build-chip" id="buildChip">Build: carregando…</div>
+            <div class="build-chip" id="completionChip">Conclusão: --</div>
+          </section>
 
           <section class="stats-grid" id="statsGrid" aria-label="Resumo de carreira"></section>
 
           <section class="section-block glass-panel">
             <div class="section-head">
               <div>
-                <p class="eyebrow">Sessões disponíveis</p>
-                <h3>Briefings ao vivo</h3>
+                <p class="eyebrow">Aeroportos principais</p>
+                <h3>Selecione sua torre ATC</h3>
+              </div>
+              <span class="tiny-pill" id="airportCountTag">0 torres</span>
+            </div>
+            <div class="airport-grid" id="airportGrid"></div>
+          </section>
+
+          <section class="section-block glass-panel">
+            <div class="section-head">
+              <div>
+                <p class="eyebrow">Janelas operacionais</p>
+                <h3>Escolha a intensidade da sessão</h3>
               </div>
               <span class="tiny-pill" id="selectedScenarioTag">Pronto</span>
             </div>
@@ -86,32 +100,45 @@
           <div class="game-hud glass-panel">
             <div>
               <p class="eyebrow">Operação em andamento</p>
-              <h2 id="gameTitle">Janela ativa</h2>
+              <h2 id="gameTitle">Radar local</h2>
             </div>
             <div class="hud-metrics">
               <div class="metric-card"><span>Tempo</span><strong id="hudTime">00:00</strong></div>
               <div class="metric-card"><span>Score</span><strong id="hudScore">0</strong></div>
-              <div class="metric-card"><span>Calma</span><strong id="hudCalm">100</strong></div>
-              <div class="metric-card"><span>Landings</span><strong id="hudLandings">0</strong></div>
+              <div class="metric-card"><span>Calma</span><strong id="hudCalm">100%</strong></div>
+              <div class="metric-card"><span>Pousos</span><strong id="hudLandings">0</strong></div>
             </div>
           </div>
 
-          <div class="world-stage glass-panel" id="worldStage">
-            <canvas id="worldCanvas"></canvas>
-            <canvas id="fxCanvas"></canvas>
-            <div id="markerLayer" class="marker-layer"></div>
-            <div class="world-legend glass-strip">
-              <span><i class="legend-dot dot-green"></i> Fluxo estável</span>
-              <span><i class="legend-dot dot-gold"></i> Atenção</span>
-              <span><i class="legend-dot dot-red"></i> Conflito</span>
+          <section class="radar-layout">
+            <div class="radar-stage glass-panel" id="worldStage" aria-label="Radar ATC local">
+              <svg id="radarSvg" class="radar-svg" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid meet"></svg>
+              <div id="markerLayer" class="marker-layer"></div>
+              <div class="world-legend glass-strip">
+                <span><i class="legend-dot dot-green"></i> Estável</span>
+                <span><i class="legend-dot dot-gold"></i> Atenção</span>
+                <span><i class="legend-dot dot-red"></i> Conflito</span>
+              </div>
             </div>
-          </div>
+
+            <aside class="glass-panel radar-sidepanel">
+              <div class="section-head compact">
+                <div>
+                  <p class="eyebrow">Torre selecionada</p>
+                  <h3 id="selectedAirportTitle">Aguardando seleção</h3>
+                </div>
+                <span class="tiny-pill" id="selectedAirportTag">TMA</span>
+              </div>
+              <div class="airport-brief" id="airportBrief"></div>
+              <div class="alert-stack" id="alertStack"></div>
+            </aside>
+          </section>
 
           <div class="ops-grid">
             <aside class="glass-panel flight-strip-panel">
               <div class="section-head compact">
                 <div>
-                  <p class="eyebrow">Malha ativa</p>
+                  <p class="eyebrow">Tráfego ativo</p>
                   <h3>Flight strips</h3>
                 </div>
                 <span class="tiny-pill" id="liveFlightsCount">0 voos</span>
@@ -129,7 +156,7 @@
               </div>
 
               <div class="selected-flight-card" id="selectedFlightCard">
-                <p>Toque em uma aeronave ou faixa para abrir comandos operacionais.</p>
+                <p>Toque em uma faixa ou contato radar para abrir comandos da aeronave.</p>
               </div>
 
               <div class="command-grid" id="commandGrid">
@@ -137,10 +164,10 @@
                 <button class="command-button" data-command="altitudeDown" type="button">ALT −</button>
                 <button class="command-button" data-command="speedUp" type="button">SPD +</button>
                 <button class="command-button" data-command="speedDown" type="button">SPD −</button>
-                <button class="command-button" data-command="vectorLeft" type="button">Vetor ◀</button>
-                <button class="command-button" data-command="vectorRight" type="button">Vetor ▶</button>
-                <button class="command-button" data-command="hold" type="button">Holding</button>
-                <button class="command-button" data-command="priority" type="button">Prioridade</button>
+                <button class="command-button" data-command="vectorLeft" type="button">HDG ◀</button>
+                <button class="command-button" data-command="vectorRight" type="button">HDG ▶</button>
+                <button class="command-button" data-command="hold" type="button">HOLD</button>
+                <button class="command-button" data-command="priority" type="button">CLR APP</button>
               </div>
             </section>
           </div>

@@ -1,3 +1,13 @@
 [
-  {"id":"north_atlantic_corridor","title":"Corredor Norte","blurb":"Mais slots oceânicos, mais trocas de altitude e clima agressivo.","difficulty":"Avançado","maxActive":8,"targetScore":1650,"duration":240,"spawnInterval":3.9,"rankRequired":"controller"}
+  {
+    "id": "atlantic_wave",
+    "title": "Atlantic Wave",
+    "blurb": "Onda de chegadas europeias em hubs densos com menos margem para vetoração longa.",
+    "difficulty": "Avançado",
+    "maxActive": 7,
+    "targetScore": 1480,
+    "duration": 220,
+    "spawnInterval": 4.0,
+    "rankRequired": "controller"
+  }
 ]

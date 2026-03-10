@@ -1,5 +1,48 @@
 [
-  {"id":"LAX","iata":"LAX","name":"Los Angeles International","city":"Los Angeles","country":"USA","lat":33.9416,"lon":-118.4085,"traffic":1.15},
-  {"id":"ICN","iata":"ICN","name":"Incheon","city":"Seoul","country":"South Korea","lat":37.4602,"lon":126.4407,"traffic":1.08},
-  {"id":"AKL","iata":"AKL","name":"Auckland","city":"Auckland","country":"New Zealand","lat":-37.0082,"lon":174.785,"traffic":0.78}
+  {
+    "id": "SIN",
+    "iata": "SIN",
+    "icao": "WSSS",
+    "name": "Singapore Changi",
+    "city": "Singapore",
+    "country": "Singapura",
+    "traffic": 1.12,
+    "trafficLabel": "Alto",
+    "tmaRadiusNm": 58,
+    "unlockRank": "director",
+    "description": "Hub asiático de grande precisão com longas aproximações e saídas coordenadas sobre o mar.",
+    "runways": [
+      { "id": "02L/20R", "heading": 20, "oppositeHeading": 200, "visualLength": 56 },
+      { "id": "02C/20C", "heading": 20, "oppositeHeading": 200, "visualLength": 52 }
+    ],
+    "fixes": [
+      { "name": "LAVAX", "bearing": 350, "distanceNm": 50, "type": "arrival" },
+      { "name": "BOBAG", "bearing": 75, "distanceNm": 47, "type": "arrival" },
+      { "name": "DOVAN", "bearing": 205, "distanceNm": 52, "type": "departure" },
+      { "name": "KEXAS", "bearing": 130, "distanceNm": 50, "type": "departure" }
+    ]
+  },
+  {
+    "id": "SYD",
+    "iata": "SYD",
+    "icao": "YSSY",
+    "name": "Sydney",
+    "city": "Sydney",
+    "country": "Austrália",
+    "traffic": 0.98,
+    "trafficLabel": "Médio",
+    "tmaRadiusNm": 54,
+    "unlockRank": "director",
+    "description": "Operação costeira com boa leitura de final, ideal para polir aproximações estáveis.",
+    "runways": [
+      { "id": "16R/34L", "heading": 160, "oppositeHeading": 340, "visualLength": 54 },
+      { "id": "16L/34R", "heading": 160, "oppositeHeading": 340, "visualLength": 50 }
+    ],
+    "fixes": [
+      { "name": "RIVET", "bearing": 20, "distanceNm": 46, "type": "arrival" },
+      { "name": "MARLN", "bearing": 295, "distanceNm": 48, "type": "arrival" },
+      { "name": "KELET", "bearing": 180, "distanceNm": 50, "type": "departure" },
+      { "name": "TESAT", "bearing": 120, "distanceNm": 45, "type": "departure" }
+    ]
+  }
 ]

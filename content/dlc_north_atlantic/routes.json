@@ -1,6 +1,4 @@
 [
-  {"id":"bos-dub","from":"BOS","to":"DUB","difficulty":0.95},
-  {"id":"jfk-kef","from":"JFK","to":"KEF","difficulty":1.05},
-  {"id":"kef-lhr","from":"KEF","to":"LHR","difficulty":0.9},
-  {"id":"dub-cdg","from":"DUB","to":"CDG","difficulty":0.85}
+  { "airportId": "CDG", "name": "OKIPA 2A", "type": "STAR" },
+  { "airportId": "AMS", "name": "ARTIP 1A", "type": "STAR" }
 ]

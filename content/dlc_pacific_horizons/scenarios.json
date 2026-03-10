@@ -1,3 +1,13 @@
 [
-  {"id":"pacific_horizons","title":"Horizontes do Pacífico","blurb":"Cruzes longos e carga intercontinental com maior exigência de cadência.","difficulty":"Especialista","maxActive":9,"targetScore":1850,"duration":260,"spawnInterval":3.6,"rankRequired":"director"}
+  {
+    "id": "pacific_evening",
+    "title": "Pacific Evening",
+    "blurb": "Fluxo progressivo de chegadas com saídas long-haul ocupando o mesmo radar local.",
+    "difficulty": "Avançado",
+    "maxActive": 7,
+    "targetScore": 1520,
+    "duration": 220,
+    "spawnInterval": 4.0,
+    "rankRequired": "director"
+  }
 ]

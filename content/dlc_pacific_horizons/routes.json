@@ -1,6 +1,4 @@
 [
-  {"id":"lax-hnd","from":"LAX","to":"HND","difficulty":1.25},
-  {"id":"lax-icn","from":"LAX","to":"ICN","difficulty":1.2},
-  {"id":"hnd-akl","from":"HND","to":"AKL","difficulty":1.15},
-  {"id":"syd-akl","from":"SYD","to":"AKL","difficulty":0.84}
+  { "airportId": "SIN", "name": "LAVAX 1A", "type": "STAR" },
+  { "airportId": "SYD", "name": "RIVET 2A", "type": "STAR" }
 ]

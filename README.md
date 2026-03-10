@@ -1,67 +1,38 @@
 # SkyFlow Control
 
-## Build atual
+Build atual: **2.0.0**  
+Build local: **09/03/2026 22:20:00**  
+Conclusão estimada: **99%**
 
-- versão: `1.2.0`
-- build local: `09/03/2026 21:45:00`
-- build UTC: `2026-03-09 21:45:00 UTC`
-- conclusão desta entrega: `96%`
-- correções e melhorias incluídas: `modal corrigido, jogabilidade refinada, mapa redesenhado e aeronaves retrabalhadas`
+## Visão geral
 
-SkyFlow Control é um jogo web mobile-first em HTML, CSS e JavaScript puro que simula controle de tráfego aéreo com mapa mundial estilizado, aeroportos reais, progressão de carreira, conteúdo modular e painel Admin local.
+SkyFlow Control agora usa uma estrutura mais jogável e próxima de uma operação real de ATC:
 
-## O que vem nesta entrega
+- seleção de **um aeroporto por vez** para operar como torre/radar terminal
+- radar local em **SVG** com leitura circular estilo ATC
+- aeroportos reais com pistas e fixes principais simplificados
+- cenários operacionais focados em chegadas e saídas na TMA
+- carreira local com progressão por rank
+- arquitetura de conteúdo modular via `content/` para DLCs e expansões
+- painel Admin local para gerenciar pacotes e importar/exportar conteúdo
 
-- jogo funcional com mapa do mundo, aeroportos reais e malha aérea dinâmica
-- layout mobile-first com suporte completo para desktop
-- visual premium com glassmorphism, microinterações e HUD estilo produto AAA
-- sistema de carreira local com XP, créditos, ranks e recordes
-- arquitetura modular de conteúdo via `content/` com manifests JSON
-- DLCs built-in e suporte a pacotes customizados salvos em `localStorage`
-- painel Admin local em `admin.html` para criar, editar, remover, exportar e importar pacotes
-- estrutura pronta para GitHub Pages
-- service worker e `manifest.webmanifest` para experiência mais próxima de app
+## Estrutura
 
-## Credenciais padrão do Admin
-
-- usuário: `admin`
-- senha: `tower123`
-
-As credenciais são locais e podem ser alteradas no próprio painel Admin.
-
-## Estrutura do projeto
-
-```text
-skyflow-control/
-├── admin.html
-├── index.html
-├── manifest.webmanifest
-├── service-worker.js
-├── README.md
-├── assets/
-│   ├── branding/
-│   └── data/
-├── content/
-│   ├── index.json
-│   ├── core/
-│   ├── dlc_north_atlantic/
-│   └── dlc_pacific_horizons/
-├── css/
-│   ├── tokens.css
-│   ├── styles.css
-│   └── admin.css
-└── js/
-    ├── app.js
-    ├── admin/
-    ├── core/
-    └── game/
-```
+- `index.html` — jogo principal
+- `admin.html` — painel administrativo local
+- `css/` — estilos do jogo e do admin
+- `js/` — core, simulação, radar e UI
+- `content/` — pacotes de conteúdo e DLCs
+- `assets/branding/` — identidade visual
+- `build-info.json` — versão, data/hora e porcentagem de conclusão
 
 ## Como rodar localmente
 
-Como o jogo carrega manifests e datasets JSON, o ideal é servir o projeto por HTTP local.
+### Opção simples
 
-### Opção 1: Python
+Abra a pasta do projeto em um servidor local estático.
+
+Exemplo com Python:
 
 ```bash
 python -m http.server 8080
@@ -70,124 +41,39 @@ python -m http.server 8080
 Depois abra:
 
 ```text
-http://localhost:8080
+http://localhost:8080/
 ```
 
-### Opção 2: VS Code Live Server
-
-Abra a pasta do projeto e use a extensão Live Server.
-
-## Como publicar no GitHub Pages
+## Publicação no GitHub Pages
 
 1. Crie um repositório no GitHub.
-2. Envie todos os arquivos desta pasta para a branch principal.
-3. No GitHub, entre em **Settings > Pages**.
-4. Em **Build and deployment**, escolha **Deploy from a branch**.
-5. Selecione a branch principal e a pasta `/root`.
-6. Salve.
-7. Aguarde o GitHub Pages publicar a URL.
+2. Envie todos os arquivos da raiz do projeto.
+3. Em **Settings > Pages**, selecione a branch principal e a pasta raiz.
+4. Aguarde o deploy.
+5. O jogo ficará disponível em uma URL do GitHub Pages.
 
-Tudo está com caminhos relativos, então a estrutura já está pronta para publicação estática.
+## Admin local
 
-## Como jogar
+Login padrão:
 
-1. Abra `index.html` pelo servidor local ou pela URL publicada.
-2. Escolha um briefing na tela inicial.
-3. Toque em **Iniciar janela**.
-4. Selecione um voo pelo mapa ou pela lista de flight strips.
-5. Use os comandos:
-   - `ALT +` e `ALT −`
-   - `SPD +` e `SPD −`
-   - `Vetor ◀` e `Vetor ▶`
-   - `Holding`
-   - `Prioridade`
-6. Mantenha separação entre aeronaves e reduza altitude antes da aproximação final.
-7. Ao fim da sessão, o debrief atualiza a carreira local.
+- usuário: `admin`
+- senha: `tower123`
 
-## Sistema de conteúdo e DLC
+## Conteúdo modular
 
-O core do jogo não precisa ser alterado para expandir conteúdo.
+Cada pacote possui manifest e datasets próprios:
 
-### Como funciona
+- `airports.json`
+- `routes.json`
+- `scenarios.json`
 
-- `content/index.json` lista os pacotes disponíveis.
-- cada pacote tem um `manifest.json`
-- cada manifesto aponta para:
-  - `airports.json`
-  - `routes.json`
-  - `scenarios.json`
-- o `ContentManager` resolve pacotes ativos e mistura tudo em tempo de execução
-- o perfil do jogador guarda quais pacotes estão ativos
-- pacotes customizados criados pelo Admin são salvos em `localStorage`
+A arquitetura permite adicionar novos aeroportos ou DLCs sem alterar o core.
 
-### Built-in incluídos
+## Observações da build 2.0.0
 
-- `core`
-- `dlc_north_atlantic`
-- `dlc_pacific_horizons`
+Esta build substitui o antigo mapa mundial por uma abordagem mais realista e jogável:
 
-## Painel Admin
-
-Abra `admin.html`.
-
-### O que dá para fazer
-
-- login local
-- ativar e desativar pacotes no perfil atual
-- clonar DLC built-in para criar variações
-- criar pacote custom do zero
-- editar datasets JSON de aeroportos, rotas e cenários
-- subir cover image opcional para o pacote
-- exportar um pacote individual
-- exportar o estado completo do Admin
-- importar estado completo ou pacote isolado
-- alterar as regras globais locais do jogo
-- trocar as credenciais locais do painel
-
-## Modelo de pacote custom
-
-Cada pacote segue esta estrutura lógica:
-
-```json
-{
-  "id": "custom_global_lane",
-  "title": "Custom Global Lane",
-  "subtitle": "Expansão personalizada",
-  "version": "1.0.0",
-  "unlockRank": "cadet",
-  "description": "Pacote criado no Admin.",
-  "theme": {
-    "accent": "#72f6d5",
-    "glow": "#6da9ff",
-    "surface": "#0f1830"
-  },
-  "datasets": {
-    "airports": [],
-    "routes": [],
-    "scenarios": []
-  }
-}
-```
-
-## Próximos passos fáceis de adicionar
-
-- backend real para autenticação e persistência multiusuário
-- ranking online
-- economia mais profunda de carreira
-- eventos ao vivo por região
-- meteorologia mais complexa
-- miniaturas 3D reais em WebGL
-- campanhas guiadas por narrativas
-- replay operacional e heatmaps
-
-## Observações técnicas
-
-- projeto feito sem frameworks
-- usa apenas HTML, CSS e JavaScript vanilla
-- dados de progresso e Admin ficam em `localStorage`
-- há fallback de conteúdo embutido para reduzir risco em ambientes onde o fetch local falhar
-- o service worker faz cache local dos assets principais
-
-## Licença sugerida
-
-Se desejar publicar no GitHub, recomendo adicionar uma licença MIT.
+- o jogador escolhe uma torre específica
+- o radar mostra apenas a área terminal do aeroporto selecionado
+- a simulação ficou mais clara para comandos rápidos em mobile e desktop
+- a base está pronta para aprofundar táxi, gate, SID/STAR detalhadas e clima avançado nas próximas builds

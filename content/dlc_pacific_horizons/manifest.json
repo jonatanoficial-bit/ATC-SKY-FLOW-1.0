@@ -1,12 +1,14 @@
 {
-  "id":"dlc_pacific_horizons",
-  "title":"Pacific Horizons",
-  "subtitle":"DLC transoceânica",
-  "version":"1.0.0",
-  "type":"dlc",
-  "unlockRank":"director",
-  "enabledByDefault":false,
-  "description":"Expande o jogo para o Pacífico com rotas longas e hubs asiáticos adicionais.",
-  "theme":{"accent":"#8cc7ff","glow":"#72f6d5","surface":"#11233c"},
-  "datasets":{"airports":"./airports.json","routes":"./routes.json","scenarios":"./scenarios.json"}
+  "id": "dlc_pacific_horizons",
+  "title": "Pacific Horizons",
+  "description": "Expansão focada em hubs do Pacífico com chegadas costeiras e saídas long-haul.",
+  "version": "2.0.0",
+  "type": "dlc",
+  "unlockRank": "director",
+  "enabledByDefault": false,
+  "datasets": {
+    "airports": "./airports.json",
+    "routes": "./routes.json",
+    "scenarios": "./scenarios.json"
+  }
 }

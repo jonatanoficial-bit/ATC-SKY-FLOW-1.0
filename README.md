@@ -1,79 +1,76 @@
 # SkyFlow Control
 
-Build atual: **2.0.0**  
-Build local: **09/03/2026 22:20:00**  
+Build atual: **2.1.0**  
 Conclusão estimada: **99%**
 
 ## Visão geral
+SkyFlow Control é um simulador ATC mobile-first em HTML, CSS e JavaScript puro. Nesta build, o foco saiu do mapa mundial e passou para uma operação mais realista: o jogador escolhe um aeroporto principal e opera apenas a TMA local, com radar em SVG, comunicações estilo máquina de escrever, carreira, conteúdo modular e suporte a português e inglês.
 
-SkyFlow Control agora usa uma estrutura mais jogável e próxima de uma operação real de ATC:
+## O que há nesta build
+- seleção de aeroportos principais do mundo com ICAO/IATA reais
+- radar local em SVG com fixes, pistas e TMA por aeroporto
+- miniaturas visuais de aeronaves inspiradas em modelos reais ICAO
+- chegadas e saídas separadas
+- rádio / CPDLC simplificado com mensagens estilo typewriter
+- comandos ATC digitados ou por atalhos rápidos
+- interface bilíngue PT/EN
+- estrutura pronta para GitHub Pages
+- área Admin mantida para evolução do conteúdo
 
-- seleção de **um aeroporto por vez** para operar como torre/radar terminal
-- radar local em **SVG** com leitura circular estilo ATC
-- aeroportos reais com pistas e fixes principais simplificados
-- cenários operacionais focados em chegadas e saídas na TMA
-- carreira local com progressão por rank
-- arquitetura de conteúdo modular via `content/` para DLCs e expansões
-- painel Admin local para gerenciar pacotes e importar/exportar conteúdo
-
-## Estrutura
-
-- `index.html` — jogo principal
-- `admin.html` — painel administrativo local
-- `css/` — estilos do jogo e do admin
-- `js/` — core, simulação, radar e UI
-- `content/` — pacotes de conteúdo e DLCs
-- `assets/branding/` — identidade visual
-- `build-info.json` — versão, data/hora e porcentagem de conclusão
+## Aeroportos incluídos
+- SBGR / GRU — São Paulo Guarulhos
+- KJFK / JFK — New York JFK
+- EGLL / LHR — London Heathrow
+- OMDB / DXB — Dubai International
+- RJTT / HND — Tokyo Haneda
+- EDDF / FRA — Frankfurt
+- LFPG / CDG — Paris Charles de Gaulle
+- EHAM / AMS — Amsterdam Schiphol
 
 ## Como rodar localmente
+Como o projeto usa módulos ES, rode em servidor local.
 
-### Opção simples
-
-Abra a pasta do projeto em um servidor local estático.
-
-Exemplo com Python:
-
+### Opção 1 — Python
 ```bash
 python -m http.server 8080
 ```
-
 Depois abra:
-
 ```text
-http://localhost:8080/
+http://localhost:8080
 ```
 
-## Publicação no GitHub Pages
+### Opção 2 — VS Code Live Server
+Abra a pasta do projeto e use a extensão Live Server.
 
-1. Crie um repositório no GitHub.
-2. Envie todos os arquivos da raiz do projeto.
-3. Em **Settings > Pages**, selecione a branch principal e a pasta raiz.
-4. Aguarde o deploy.
-5. O jogo ficará disponível em uma URL do GitHub Pages.
+## Como publicar no GitHub Pages
+1. Suba o conteúdo deste projeto para um repositório GitHub.
+2. Em **Settings > Pages**, configure a branch principal e a pasta raiz.
+3. Aguarde a publicação.
+4. Como o projeto é estático e inclui `.nojekyll`, ele é compatível com GitHub Pages.
 
-## Admin local
+## Estrutura principal
+```text
+/assets              logos, ícones e dados auxiliares
+/content/core        aeroportos e cenários base
+/content/dlc_*       espaço para expansões modulares
+/css                 tokens e estilos
+/js/game             simulação e radar
+/js/admin            área administrativa
+build-info.json      versão, data/hora e progresso da build
+```
 
-Login padrão:
+## Comandos ATC aceitos
+- `ALT 5000`
+- `HDG 270`
+- `SPD 180`
+- `APP`
+- `LAND`
+- `TAXI`
+- `TAKEOFF`
+- `HANDOFF`
+- `HOLD`
 
-- usuário: `admin`
-- senha: `tower123`
-
-## Conteúdo modular
-
-Cada pacote possui manifest e datasets próprios:
-
-- `airports.json`
-- `routes.json`
-- `scenarios.json`
-
-A arquitetura permite adicionar novos aeroportos ou DLCs sem alterar o core.
-
-## Observações da build 2.0.0
-
-Esta build substitui o antigo mapa mundial por uma abordagem mais realista e jogável:
-
-- o jogador escolhe uma torre específica
-- o radar mostra apenas a área terminal do aeroporto selecionado
-- a simulação ficou mais clara para comandos rápidos em mobile e desktop
-- a base está pronta para aprofundar táxi, gate, SID/STAR detalhadas e clima avançado nas próximas builds
+## Observações importantes
+- Os aeroportos, frequências, pistas, fixes e lógica operacional foram simplificados para manter a jogabilidade.
+- A base foi desenhada para futura expansão com STAR/SID mais detalhadas, vento, ocupação de pista, separação por wake turbulence e integração com backend.
+- O Admin atual continua local/static-first e pronto para evoluir.

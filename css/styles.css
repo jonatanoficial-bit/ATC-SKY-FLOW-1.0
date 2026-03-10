@@ -718,3 +718,279 @@ button {
   .radar-layout { grid-template-columns: minmax(0, 1.2fr) minmax(19rem, 0.5fr); }
   .radar-stage { min-height: 42rem; }
 }
+
+.primary-button,
+.secondary-button,
+.compact-button {
+  border: 0;
+  color: #eef7ff;
+  padding: 0.95rem 1.1rem;
+  border-radius: 1rem;
+  background: linear-gradient(135deg, rgba(62, 122, 255, 0.95), rgba(83, 220, 189, 0.78));
+  box-shadow: 0 16px 30px rgba(23, 88, 177, 0.28), inset 0 1px 0 rgba(255,255,255,0.18);
+}
+
+.secondary-button {
+  background: linear-gradient(180deg, rgba(19,32,44,0.92), rgba(9,18,28,0.84));
+  border: 1px solid rgba(145, 188, 255, 0.13);
+}
+
+.atc-hero-card,
+.atc-command-dock,
+.atc-sidepanel {
+  gap: 1rem;
+}
+
+.airport-description {
+  margin: 0.35rem 0 0.8rem;
+  color: #9db7d4;
+  line-height: 1.5;
+}
+
+.atc-radar-layout {
+  display: grid;
+  gap: 1rem;
+}
+
+.atc-radar-stage {
+  position: relative;
+  min-height: 72vw;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.radar-svg,
+.marker-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.marker-layer {
+  z-index: 3;
+}
+
+.sweep-beam {
+  position: absolute;
+  inset: 6%;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, rgba(91, 255, 185, 0.0) 0deg, rgba(91, 255, 185, 0.12) 26deg, rgba(91, 255, 185, 0.0) 54deg);
+  filter: blur(2px);
+  transform-origin: center;
+  animation: radarSweep 5.8s linear infinite;
+  z-index: 1;
+  pointer-events: none;
+}
+
+@keyframes radarSweep {
+  to { transform: rotate(360deg); }
+}
+
+.aircraft-marker {
+  position: absolute;
+  translate: -50% -50%;
+  display: grid;
+  align-items: center;
+  justify-items: center;
+  gap: 0.2rem;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  z-index: 4;
+}
+
+.aircraft-model {
+  width: 2rem;
+  height: 2rem;
+  display: inline-grid;
+  place-items: center;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.35));
+}
+
+.aircraft-model svg {
+  width: 100%;
+  height: 100%;
+}
+
+.aircraft-tag {
+  min-width: 7.8rem;
+  background: rgba(5, 12, 19, 0.84);
+  border: 1px solid rgba(117, 229, 195, 0.2);
+  border-radius: 0.85rem;
+  padding: 0.35rem 0.5rem;
+  display: grid;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.28);
+}
+
+.aircraft-tag strong,
+.aircraft-tag small {
+  text-align: left;
+}
+
+.aircraft-tag strong {
+  font-size: 0.72rem;
+}
+
+.aircraft-tag small {
+  font-size: 0.62rem;
+  color: #98afc9;
+}
+
+.aircraft-marker.stable .aircraft-tag { border-color: rgba(113, 232, 177, 0.28); }
+.aircraft-marker.warning .aircraft-tag { border-color: rgba(255, 202, 87, 0.42); }
+.aircraft-marker.conflict .aircraft-tag { border-color: rgba(255, 109, 109, 0.48); }
+.aircraft-marker.selected .aircraft-tag { box-shadow: 0 0 0 2px rgba(112, 192, 255, 0.36); }
+
+.radio-log-block {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.radio-log {
+  display: grid;
+  gap: 0.55rem;
+  max-height: 22rem;
+  overflow: auto;
+  padding-right: 0.2rem;
+}
+
+.radio-line {
+  display: grid;
+  gap: 0.18rem;
+  padding: 0.75rem 0.85rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(145, 188, 255, 0.11);
+  background: rgba(4, 11, 18, 0.82);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  line-height: 1.45;
+}
+
+.radio-line small {
+  color: #87a7d8;
+  letter-spacing: 0.18em;
+}
+
+.radio-line.pilot { border-color: rgba(102, 220, 187, 0.22); }
+.radio-line.atc { border-color: rgba(102, 160, 255, 0.24); }
+.radio-line.system { border-color: rgba(255, 214, 88, 0.18); }
+
+.quick-command-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.7rem;
+}
+
+.command-input-wrap {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.command-input-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.65rem;
+}
+
+.command-input-row input {
+  width: 100%;
+  border: 1px solid rgba(145, 188, 255, 0.14);
+  background: rgba(6, 13, 21, 0.86);
+  color: #eef7ff;
+  padding: 1rem 1rem;
+  border-radius: 1rem;
+  outline: none;
+}
+
+.command-input-row input:focus {
+  border-color: rgba(117, 217, 255, 0.4);
+  box-shadow: 0 0 0 3px rgba(72, 136, 255, 0.12);
+}
+
+.flight-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.7rem;
+}
+
+.flight-detail-grid span {
+  display: block;
+  color: #87a6c6;
+  font-size: 0.72rem;
+  margin-bottom: 0.15rem;
+}
+
+.flight-strip-row {
+  color: #9eb5ce;
+  font-size: 0.8rem;
+}
+
+.compact-legend {
+  position: absolute;
+  left: 1rem;
+  right: 1rem;
+  bottom: 1rem;
+  display: flex;
+  justify-content: space-between;
+  z-index: 4;
+}
+
+.legend-dot {
+  width: 0.72rem;
+  height: 0.72rem;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 0.35rem;
+}
+
+.dot-green { background: #4df0a2; }
+.dot-gold { background: #f6c64b; }
+.dot-red { background: #ff7373; }
+
+.small-label {
+  color: #8aa7c8;
+}
+
+.toast {
+  background: rgba(9, 19, 31, 0.92);
+  color: #eef7ff;
+  padding: 0.8rem 0.95rem;
+  border-radius: 0.95rem;
+  border: 1px solid rgba(145, 188, 255, 0.14);
+  box-shadow: 0 18px 32px rgba(0,0,0,0.28);
+}
+
+.toast-layer {
+  position: fixed;
+  right: 1rem;
+  bottom: calc(6rem + env(safe-area-inset-bottom));
+  display: grid;
+  gap: 0.65rem;
+  z-index: 20;
+}
+
+@media (min-width: 900px) {
+  .atc-radar-layout {
+    grid-template-columns: minmax(0, 1.7fr) minmax(320px, 0.9fr);
+  }
+
+  .atc-radar-stage {
+    min-height: 46rem;
+  }
+
+  .atc-ops-grid {
+    display: grid;
+    grid-template-columns: minmax(320px, 0.9fr) minmax(0, 1.1fr);
+    gap: 1rem;
+  }
+
+  .hero-card {
+    grid-template-columns: minmax(0, 1.5fr) minmax(300px, 0.9fr);
+    align-items: stretch;
+  }
+
+  .airport-grid,
+  .mission-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

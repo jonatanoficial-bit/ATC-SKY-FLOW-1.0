@@ -3,139 +3,225 @@
     "id": "GRU",
     "iata": "GRU",
     "icao": "SBGR",
-    "name": "São Paulo Guarulhos",
+    "name": "São Paulo/Guarulhos International Airport",
     "city": "São Paulo",
     "country": "Brasil",
-    "traffic": 1.08,
-    "trafficLabel": "Alto",
+    "timezone": "BRT",
+    "trafficLabel": "Muito alto",
+    "traffic": 1.05,
     "tmaRadiusNm": 60,
     "unlockRank": "cadet",
-    "description": "Hub brasileiro com duas pistas paralelas, aproximações pelo norte e saídas distribuídas entre leste e sul.",
+    "description": "Hub brasileiro com duas pistas paralelas, fluxo pesado LATAM/GOL/Azul e chegadas pelas transições norte, leste e sul.",
+    "frequencies": {"tower": "118.10", "approach": "119.75", "ground": "121.90"},
+    "elevationFt": 2459,
+    "transitionAltitudeFt": 8000,
     "runways": [
-      { "id": "10L/28R", "heading": 100, "oppositeHeading": 280, "visualLength": 58 },
-      { "id": "10R/28L", "heading": 100, "oppositeHeading": 280, "visualLength": 52 }
+      {"id": "10L/28R", "heading": 100, "oppositeHeading": 280, "lengthM": 3700, "active": "arrivals"},
+      {"id": "10R/28L", "heading": 100, "oppositeHeading": 280, "lengthM": 3000, "active": "departures"}
     ],
     "fixes": [
-      { "name": "MOPAR", "bearing": 330, "distanceNm": 52, "type": "arrival" },
-      { "name": "BAVIN", "bearing": 45, "distanceNm": 49, "type": "arrival" },
-      { "name": "SISDE", "bearing": 180, "distanceNm": 54, "type": "arrival" },
-      { "name": "UGREX", "bearing": 110, "distanceNm": 46, "type": "departure" },
-      { "name": "NAXOV", "bearing": 225, "distanceNm": 51, "type": "departure" }
-    ]
+      {"name": "MOPAR", "bearing": 328, "distanceNm": 54, "type": "arrival"},
+      {"name": "BAVIN", "bearing": 42, "distanceNm": 51, "type": "arrival"},
+      {"name": "SISDE", "bearing": 188, "distanceNm": 52, "type": "arrival"},
+      {"name": "UGREX", "bearing": 118, "distanceNm": 49, "type": "departure"},
+      {"name": "NAXOV", "bearing": 226, "distanceNm": 53, "type": "departure"}
+    ],
+    "preferredConfig": {"arrivalRunway": "10L/28R", "departureRunway": "10R/28L", "finalBearing": 280}
   },
   {
     "id": "JFK",
     "iata": "JFK",
     "icao": "KJFK",
-    "name": "John F. Kennedy International",
+    "name": "John F. Kennedy International Airport",
     "city": "New York",
-    "country": "EUA",
-    "traffic": 1.2,
+    "country": "USA",
+    "timezone": "EST",
     "trafficLabel": "Muito alto",
+    "traffic": 1.18,
     "tmaRadiusNm": 62,
     "unlockRank": "cadet",
-    "description": "Grande hub costeiro com chegadas oceânicas e forte mistura de operações domésticas e internacionais.",
+    "description": "Hub atlântico com chegadas CAMRN e ROBER, mistura intensa de widebodies e domestics e forte coordenação com oceânico.",
+    "frequencies": {"tower": "123.90", "approach": "125.70", "ground": "121.90"},
+    "elevationFt": 13,
+    "transitionAltitudeFt": 10000,
     "runways": [
-      { "id": "04L/22R", "heading": 44, "oppositeHeading": 224, "visualLength": 54 },
-      { "id": "13L/31R", "heading": 134, "oppositeHeading": 314, "visualLength": 56 }
+      {"id": "04L/22R", "heading": 44, "oppositeHeading": 224, "lengthM": 3682, "active": "arrivals"},
+      {"id": "13L/31R", "heading": 134, "oppositeHeading": 314, "lengthM": 3048, "active": "departures"}
     ],
     "fixes": [
-      { "name": "CAMRN", "bearing": 320, "distanceNm": 50, "type": "arrival" },
-      { "name": "ROBER", "bearing": 40, "distanceNm": 53, "type": "arrival" },
-      { "name": "HAARP", "bearing": 115, "distanceNm": 48, "type": "departure" },
-      { "name": "MERIT", "bearing": 208, "distanceNm": 58, "type": "departure" }
-    ]
+      {"name": "CAMRN", "bearing": 320, "distanceNm": 53, "type": "arrival"},
+      {"name": "ROBER", "bearing": 40, "distanceNm": 52, "type": "arrival"},
+      {"name": "HAARP", "bearing": 116, "distanceNm": 48, "type": "departure"},
+      {"name": "MERIT", "bearing": 208, "distanceNm": 56, "type": "departure"}
+    ],
+    "preferredConfig": {"arrivalRunway": "04L/22R", "departureRunway": "13L/31R", "finalBearing": 224}
   },
   {
     "id": "LHR",
     "iata": "LHR",
     "icao": "EGLL",
-    "name": "Heathrow",
+    "name": "London Heathrow Airport",
     "city": "London",
-    "country": "Reino Unido",
-    "traffic": 1.28,
+    "country": "United Kingdom",
+    "timezone": "GMT/BST",
     "trafficLabel": "Muito alto",
+    "traffic": 1.24,
     "tmaRadiusNm": 58,
     "unlockRank": "controller",
-    "description": "Fluxo muito denso com pistas paralelas e gerenciamento fino de spacing em final.",
+    "description": "Operação extremamente densa com finais paralelas 27L/27R, chegadas LAM/BIG/OCK e cadência apertada em final.",
+    "frequencies": {"tower": "118.50", "approach": "119.72", "ground": "121.90"},
+    "elevationFt": 83,
+    "transitionAltitudeFt": 6000,
     "runways": [
-      { "id": "09L/27R", "heading": 90, "oppositeHeading": 270, "visualLength": 60 },
-      { "id": "09R/27L", "heading": 90, "oppositeHeading": 270, "visualLength": 54 }
+      {"id": "09L/27R", "heading": 90, "oppositeHeading": 270, "lengthM": 3902, "active": "arrivals"},
+      {"id": "09R/27L", "heading": 90, "oppositeHeading": 270, "lengthM": 3658, "active": "departures"}
     ],
     "fixes": [
-      { "name": "BIG", "bearing": 100, "distanceNm": 48, "type": "arrival" },
-      { "name": "LAM", "bearing": 40, "distanceNm": 45, "type": "arrival" },
-      { "name": "OCK", "bearing": 240, "distanceNm": 47, "type": "arrival" },
-      { "name": "DET", "bearing": 300, "distanceNm": 50, "type": "departure" }
-    ]
+      {"name": "LAM", "bearing": 40, "distanceNm": 43, "type": "arrival"},
+      {"name": "BIG", "bearing": 102, "distanceNm": 46, "type": "arrival"},
+      {"name": "OCK", "bearing": 238, "distanceNm": 44, "type": "arrival"},
+      {"name": "DET", "bearing": 304, "distanceNm": 50, "type": "departure"}
+    ],
+    "preferredConfig": {"arrivalRunway": "09L/27R", "departureRunway": "09R/27L", "finalBearing": 270}
   },
   {
     "id": "DXB",
     "iata": "DXB",
     "icao": "OMDB",
-    "name": "Dubai International",
+    "name": "Dubai International Airport",
     "city": "Dubai",
-    "country": "EAU",
-    "traffic": 1.18,
+    "country": "UAE",
+    "timezone": "GST",
     "trafficLabel": "Muito alto",
+    "traffic": 1.16,
     "tmaRadiusNm": 62,
     "unlockRank": "controller",
-    "description": "Operação de alto volume no deserto, com longas finais e intensa mistura de widebodies.",
+    "description": "Longas finais sobre o deserto, fluxo Emirates/Flydubai e grande presença de heavy jets nas 30L/30R.",
+    "frequencies": {"tower": "118.75", "approach": "124.60", "ground": "121.80"},
+    "elevationFt": 62,
+    "transitionAltitudeFt": 13000,
     "runways": [
-      { "id": "12L/30R", "heading": 120, "oppositeHeading": 300, "visualLength": 58 },
-      { "id": "12R/30L", "heading": 120, "oppositeHeading": 300, "visualLength": 54 }
+      {"id": "12L/30R", "heading": 120, "oppositeHeading": 300, "lengthM": 4447, "active": "arrivals"},
+      {"id": "12R/30L", "heading": 120, "oppositeHeading": 300, "lengthM": 4000, "active": "departures"}
     ],
     "fixes": [
-      { "name": "EMIVO", "bearing": 35, "distanceNm": 54, "type": "arrival" },
-      { "name": "RANIN", "bearing": 305, "distanceNm": 50, "type": "arrival" },
-      { "name": "IMDAX", "bearing": 180, "distanceNm": 58, "type": "departure" },
-      { "name": "SENPA", "bearing": 100, "distanceNm": 46, "type": "departure" }
-    ]
+      {"name": "EMIVO", "bearing": 32, "distanceNm": 54, "type": "arrival"},
+      {"name": "RANIN", "bearing": 304, "distanceNm": 50, "type": "arrival"},
+      {"name": "SENPA", "bearing": 104, "distanceNm": 48, "type": "departure"},
+      {"name": "IMDAX", "bearing": 182, "distanceNm": 57, "type": "departure"}
+    ],
+    "preferredConfig": {"arrivalRunway": "12L/30R", "departureRunway": "12R/30L", "finalBearing": 300}
   },
   {
     "id": "HND",
     "iata": "HND",
     "icao": "RJTT",
-    "name": "Tokyo Haneda",
+    "name": "Tokyo Haneda Airport",
     "city": "Tokyo",
-    "country": "Japão",
-    "traffic": 1.24,
+    "country": "Japan",
+    "timezone": "JST",
     "trafficLabel": "Muito alto",
+    "traffic": 1.2,
     "tmaRadiusNm": 58,
     "unlockRank": "director",
-    "description": "Hub altamente eficiente com múltiplos eixos e tráfego intenso de chegadas domésticas.",
+    "description": "Mistura de chegadas domésticas e internacionais com cadência alta, uso frequente das 34L/34R e saídas sobre a baía.",
+    "frequencies": {"tower": "118.10", "approach": "119.10", "ground": "121.70"},
+    "elevationFt": 21,
+    "transitionAltitudeFt": 14000,
     "runways": [
-      { "id": "16L/34R", "heading": 160, "oppositeHeading": 340, "visualLength": 58 },
-      { "id": "16R/34L", "heading": 160, "oppositeHeading": 340, "visualLength": 54 }
+      {"id": "16L/34R", "heading": 160, "oppositeHeading": 340, "lengthM": 3360, "active": "arrivals"},
+      {"id": "16R/34L", "heading": 160, "oppositeHeading": 340, "lengthM": 3000, "active": "departures"}
     ],
     "fixes": [
-      { "name": "KAIHO", "bearing": 65, "distanceNm": 47, "type": "arrival" },
-      { "name": "ADDUM", "bearing": 310, "distanceNm": 51, "type": "arrival" },
-      { "name": "Y20", "bearing": 200, "distanceNm": 45, "type": "departure" },
-      { "name": "EDOGR", "bearing": 135, "distanceNm": 52, "type": "departure" }
-    ]
+      {"name": "KAIHO", "bearing": 66, "distanceNm": 47, "type": "arrival"},
+      {"name": "ADDUM", "bearing": 309, "distanceNm": 51, "type": "arrival"},
+      {"name": "EDOGR", "bearing": 136, "distanceNm": 49, "type": "departure"},
+      {"name": "Y20", "bearing": 205, "distanceNm": 46, "type": "departure"}
+    ],
+    "preferredConfig": {"arrivalRunway": "16L/34R", "departureRunway": "16R/34L", "finalBearing": 340}
   },
   {
     "id": "FRA",
     "iata": "FRA",
     "icao": "EDDF",
-    "name": "Frankfurt",
+    "name": "Frankfurt Airport",
     "city": "Frankfurt",
-    "country": "Alemanha",
-    "traffic": 1.12,
+    "country": "Germany",
+    "timezone": "CET/CEST",
     "trafficLabel": "Alto",
+    "traffic": 1.1,
     "tmaRadiusNm": 56,
     "unlockRank": "director",
-    "description": "Hub europeu com forte disciplina de chegada e vetoração precisa em finais paralelas.",
+    "description": "Hub europeu com disciplina de STARs e finals paralelas, muito Lufthansa Group e handoffs frequentes.",
+    "frequencies": {"tower": "119.90", "approach": "120.80", "ground": "121.75"},
+    "elevationFt": 364,
+    "transitionAltitudeFt": 5000,
     "runways": [
-      { "id": "07L/25R", "heading": 70, "oppositeHeading": 250, "visualLength": 58 },
-      { "id": "07R/25L", "heading": 70, "oppositeHeading": 250, "visualLength": 54 }
+      {"id": "07L/25R", "heading": 70, "oppositeHeading": 250, "lengthM": 4000, "active": "arrivals"},
+      {"id": "07R/25L", "heading": 70, "oppositeHeading": 250, "lengthM": 4000, "active": "departures"}
     ],
     "fixes": [
-      { "name": "PSA", "bearing": 240, "distanceNm": 44, "type": "arrival" },
-      { "name": "TAU", "bearing": 60, "distanceNm": 47, "type": "arrival" },
-      { "name": "RID", "bearing": 330, "distanceNm": 52, "type": "departure" },
-      { "name": "SPY", "bearing": 150, "distanceNm": 50, "type": "departure" }
-    ]
+      {"name": "PSA", "bearing": 240, "distanceNm": 44, "type": "arrival"},
+      {"name": "TAU", "bearing": 58, "distanceNm": 46, "type": "arrival"},
+      {"name": "RID", "bearing": 330, "distanceNm": 52, "type": "departure"},
+      {"name": "SPY", "bearing": 148, "distanceNm": 51, "type": "departure"}
+    ],
+    "preferredConfig": {"arrivalRunway": "07L/25R", "departureRunway": "07R/25L", "finalBearing": 250}
+  },
+  {
+    "id": "CDG",
+    "iata": "CDG",
+    "icao": "LFPG",
+    "name": "Paris Charles de Gaulle Airport",
+    "city": "Paris",
+    "country": "France",
+    "timezone": "CET/CEST",
+    "trafficLabel": "Muito alto",
+    "traffic": 1.14,
+    "tmaRadiusNm": 60,
+    "unlockRank": "chief",
+    "description": "Grande hub da Air France com múltiplas pistas e longos encadeamentos em aproximação para 26L/26R.",
+    "frequencies": {"tower": "118.20", "approach": "119.25", "ground": "121.65"},
+    "elevationFt": 392,
+    "transitionAltitudeFt": 5000,
+    "runways": [
+      {"id": "08L/26R", "heading": 80, "oppositeHeading": 260, "lengthM": 4215, "active": "arrivals"},
+      {"id": "08R/26L", "heading": 80, "oppositeHeading": 260, "lengthM": 2700, "active": "departures"}
+    ],
+    "fixes": [
+      {"name": "PGS", "bearing": 212, "distanceNm": 51, "type": "arrival"},
+      {"name": "OKIPA", "bearing": 62, "distanceNm": 48, "type": "arrival"},
+      {"name": "BANOX", "bearing": 118, "distanceNm": 46, "type": "departure"},
+      {"name": "MOPAR", "bearing": 330, "distanceNm": 52, "type": "departure"}
+    ],
+    "preferredConfig": {"arrivalRunway": "08L/26R", "departureRunway": "08R/26L", "finalBearing": 260}
+  },
+  {
+    "id": "AMS",
+    "iata": "AMS",
+    "icao": "EHAM",
+    "name": "Amsterdam Schiphol Airport",
+    "city": "Amsterdam",
+    "country": "Netherlands",
+    "timezone": "CET/CEST",
+    "trafficLabel": "Alto",
+    "traffic": 1.08,
+    "tmaRadiusNm": 58,
+    "unlockRank": "chief",
+    "description": "Rede complexa de pistas e STARs, forte operação KLM e sensibilidade alta a spacing em final.",
+    "frequencies": {"tower": "119.22", "approach": "121.20", "ground": "121.80"},
+    "elevationFt": -11,
+    "transitionAltitudeFt": 3000,
+    "runways": [
+      {"id": "18R/36L", "heading": 180, "oppositeHeading": 360, "lengthM": 3800, "active": "arrivals"},
+      {"id": "18C/36C", "heading": 180, "oppositeHeading": 360, "lengthM": 3300, "active": "departures"}
+    ],
+    "fixes": [
+      {"name": "ARTIP", "bearing": 48, "distanceNm": 44, "type": "arrival"},
+      {"name": "SUGOL", "bearing": 248, "distanceNm": 45, "type": "arrival"},
+      {"name": "LEKKO", "bearing": 132, "distanceNm": 49, "type": "departure"},
+      {"name": "NORKU", "bearing": 330, "distanceNm": 53, "type": "departure"}
+    ],
+    "preferredConfig": {"arrivalRunway": "18R/36L", "departureRunway": "18C/36C", "finalBearing": 360}
   }
 ]

@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#07111d" />
     <meta
       name="description"
-      content="SkyFlow Control — simulador mobile-first de controle de tráfego aéreo com radar ATC, aeroportos reais, carreira e DLCs modulares."
+      content="SkyFlow Control — simulador mobile-first de controle de tráfego aéreo com radar local, aeroportos reais, comunicação ATC e carreira bilíngue."
     />
     <title>SkyFlow Control</title>
     <link rel="icon" type="image/svg+xml" href="./assets/branding/favicon.svg" />
@@ -15,7 +15,7 @@
     <link rel="stylesheet" href="./css/styles.css" />
   </head>
   <body>
-    <div class="app-shell">
+    <div class="app-shell atc-app-shell">
       <div class="ambient ambient-a"></div>
       <div class="ambient ambient-b"></div>
 
@@ -23,45 +23,49 @@
         <div class="brand-block">
           <img class="brand-logo" src="./assets/branding/logo.svg" alt="SkyFlow Control" />
           <div>
-            <p class="eyebrow">Controle ATC premium</p>
+            <p class="eyebrow" data-i18n="premiumLabel">ATC premium simulation</p>
             <h1>SkyFlow Control</h1>
           </div>
         </div>
 
         <div class="topbar-actions">
-          <div class="rank-pill" id="rankPill"></div>
-          <button class="chrome-button" id="pauseButton" type="button" disabled>Pausar</button>
+          <div class="rank-pill" id="rankPill">Cadete</div>
+          <button class="chrome-button" id="languageToggle" type="button">PT / EN</button>
+          <button class="chrome-button" id="pauseButton" type="button" disabled data-i18n="pause">Pausar</button>
           <a class="chrome-button chrome-link" href="./admin.html">Admin</a>
         </div>
       </header>
 
       <main class="main-grid">
-        <section class="screen active" id="dashboardScreen" aria-labelledby="dashboardTitle">
-          <section class="hero-card glass-panel">
+        <section class="screen active" id="dashboardScreen">
+          <section class="hero-card glass-panel atc-hero-card">
             <div class="hero-copy">
-              <p class="eyebrow">Seleção de torre</p>
-              <h2 id="dashboardTitle">Opere uma torre por vez com radar local, rotas reais e progressão de carreira.</h2>
-              <p class="hero-text">
-                Escolha um aeroporto, carregue uma janela operacional e controle chegadas e saídas dentro da TMA com leitura clara, comandos rápidos e fluxo jogável.
+              <p class="eyebrow" data-i18n="towerSelectEyebrow">Seleção de torre</p>
+              <h2 data-i18n="heroTitle">Escolha um aeroporto principal e opere apenas a TMA local como um controlador real.</h2>
+              <p class="hero-text" data-i18n="heroText">
+                Entre em serviço em um hub real, receba chamadas em estilo máquina de escrever, coordene táxi, decolagem, aproximação e saída do espaço aéreo com radar local inspirado em ATC real.
               </p>
               <div class="hero-actions">
-                <button class="primary-button" id="startScenarioButton" type="button">Iniciar operação</button>
-                <button class="secondary-button" id="openContentButton" type="button">Gerenciar conteúdo</button>
+                <button class="primary-button" id="startScenarioButton" type="button" data-i18n="startOperation">Iniciar operação</button>
+                <button class="secondary-button" id="openContentButton" type="button" data-i18n="manageContent">Gerenciar conteúdo</button>
               </div>
             </div>
 
             <div class="hero-side hero-side-stack">
               <div class="hero-stat-card">
-                <span class="stat-label">Aeroporto ativo</span>
-                <strong id="heroAirport">Selecione uma torre</strong>
+                <span class="stat-label" data-i18n="activeAirport">Aeroporto ativo</span>
+                <strong id="heroAirport">GRU</strong>
+                <small class="small-label" id="heroAirportMeta">SBGR · São Paulo</small>
               </div>
               <div class="hero-stat-card">
-                <span class="stat-label">Cenário</span>
-                <strong id="heroScenario">Morning Push</strong>
+                <span class="stat-label" data-i18n="activeScenario">Janela</span>
+                <strong id="heroScenario">Training Wave</strong>
+                <small class="small-label" id="heroScenarioMeta">Base · 240s</small>
               </div>
               <div class="hero-stat-card">
-                <span class="stat-label">Pacotes ativos</span>
-                <strong id="heroActivePackages">—</strong>
+                <span class="stat-label" data-i18n="realismMode">Modo</span>
+                <strong data-i18n="realismValue">Radar local + rádio bilíngue</strong>
+                <small class="small-label">ICAO · TMA · ARR/DEP</small>
               </div>
             </div>
           </section>
@@ -71,15 +75,15 @@
             <div class="build-chip" id="completionChip">Conclusão: --</div>
           </section>
 
-          <section class="stats-grid" id="statsGrid" aria-label="Resumo de carreira"></section>
+          <section class="stats-grid" id="statsGrid"></section>
 
           <section class="section-block glass-panel">
             <div class="section-head">
               <div>
-                <p class="eyebrow">Aeroportos principais</p>
-                <h3>Selecione sua torre ATC</h3>
+                <p class="eyebrow" data-i18n="majorAirports">Aeroportos principais</p>
+                <h3 data-i18n="chooseTower">Escolha a torre que você vai operar</h3>
               </div>
-              <span class="tiny-pill" id="airportCountTag">0 torres</span>
+              <span class="tiny-pill" id="airportCountTag">0</span>
             </div>
             <div class="airport-grid" id="airportGrid"></div>
           </section>
@@ -87,130 +91,121 @@
           <section class="section-block glass-panel">
             <div class="section-head">
               <div>
-                <p class="eyebrow">Janelas operacionais</p>
-                <h3>Escolha a intensidade da sessão</h3>
+                <p class="eyebrow" data-i18n="operationWindows">Janelas operacionais</p>
+                <h3 data-i18n="chooseIntensity">Escolha a intensidade da sessão</h3>
               </div>
-              <span class="tiny-pill" id="selectedScenarioTag">Pronto</span>
+              <span class="tiny-pill" id="selectedScenarioTag">Base</span>
             </div>
             <div class="mission-grid" id="scenarioGrid"></div>
           </section>
         </section>
 
-        <section class="screen" id="gameScreen" aria-labelledby="gameTitle">
+        <section class="screen" id="gameScreen">
           <div class="game-hud glass-panel">
             <div>
-              <p class="eyebrow">Operação em andamento</p>
-              <h2 id="gameTitle">Radar local</h2>
+              <p class="eyebrow" data-i18n="liveOperation">Operação em andamento</p>
+              <h2 id="gameTitle">ATC Radar</h2>
             </div>
             <div class="hud-metrics">
-              <div class="metric-card"><span>Tempo</span><strong id="hudTime">00:00</strong></div>
-              <div class="metric-card"><span>Score</span><strong id="hudScore">0</strong></div>
-              <div class="metric-card"><span>Calma</span><strong id="hudCalm">100%</strong></div>
-              <div class="metric-card"><span>Pousos</span><strong id="hudLandings">0</strong></div>
+              <div class="metric-card"><span data-i18n="time">Tempo</span><strong id="hudTime">00:00</strong></div>
+              <div class="metric-card"><span data-i18n="score">Score</span><strong id="hudScore">0</strong></div>
+              <div class="metric-card"><span data-i18n="calm">Calma</span><strong id="hudCalm">100%</strong></div>
+              <div class="metric-card"><span data-i18n="landings">Pousos</span><strong id="hudLandings">0</strong></div>
+              <div class="metric-card"><span data-i18n="handoffs">Handoffs</span><strong id="hudHandoffs">0</strong></div>
             </div>
           </div>
 
-          <section class="radar-layout">
-            <div class="radar-stage glass-panel" id="worldStage" aria-label="Radar ATC local">
+          <section class="radar-layout atc-radar-layout">
+            <div class="radar-stage glass-panel atc-radar-stage" id="worldStage" aria-label="Radar ATC local">
+              <div class="sweep-beam"></div>
               <svg id="radarSvg" class="radar-svg" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid meet"></svg>
               <div id="markerLayer" class="marker-layer"></div>
-              <div class="world-legend glass-strip">
-                <span><i class="legend-dot dot-green"></i> Estável</span>
-                <span><i class="legend-dot dot-gold"></i> Atenção</span>
-                <span><i class="legend-dot dot-red"></i> Conflito</span>
+              <div class="world-legend glass-strip compact-legend">
+                <span><i class="legend-dot dot-green"></i><span data-i18n="stable">Estável</span></span>
+                <span><i class="legend-dot dot-gold"></i><span data-i18n="attention">Atenção</span></span>
+                <span><i class="legend-dot dot-red"></i><span data-i18n="conflict">Conflito</span></span>
               </div>
             </div>
 
-            <aside class="glass-panel radar-sidepanel">
+            <aside class="glass-panel radar-sidepanel atc-sidepanel">
               <div class="section-head compact">
                 <div>
-                  <p class="eyebrow">Torre selecionada</p>
+                  <p class="eyebrow" data-i18n="selectedTower">Torre selecionada</p>
                   <h3 id="selectedAirportTitle">Aguardando seleção</h3>
                 </div>
                 <span class="tiny-pill" id="selectedAirportTag">TMA</span>
               </div>
               <div class="airport-brief" id="airportBrief"></div>
-              <div class="alert-stack" id="alertStack"></div>
+              <div class="radio-log-block">
+                <div class="section-head compact">
+                  <div>
+                    <p class="eyebrow" data-i18n="radioFeed">Rádio / CPDLC simplificado</p>
+                    <h3 data-i18n="liveComms">Mensagens ao vivo</h3>
+                  </div>
+                </div>
+                <div class="radio-log" id="radioLog"></div>
+              </div>
             </aside>
           </section>
 
-          <div class="ops-grid">
+          <div class="ops-grid atc-ops-grid">
             <aside class="glass-panel flight-strip-panel">
               <div class="section-head compact">
                 <div>
-                  <p class="eyebrow">Tráfego ativo</p>
-                  <h3>Flight strips</h3>
+                  <p class="eyebrow" data-i18n="activeTraffic">Tráfego ativo</p>
+                  <h3 data-i18n="flightStrips">Flight strips</h3>
                 </div>
-                <span class="tiny-pill" id="liveFlightsCount">0 voos</span>
+                <span class="tiny-pill" id="liveFlightsCount">0</span>
               </div>
               <div id="flightStripList" class="flight-strip-list"></div>
             </aside>
 
-            <section class="glass-panel command-dock">
+            <section class="glass-panel command-dock atc-command-dock">
               <div class="section-head compact">
                 <div>
-                  <p class="eyebrow">Controle direto</p>
-                  <h3 id="selectedFlightTitle">Selecione um voo</h3>
+                  <p class="eyebrow" data-i18n="directControl">Controle direto</p>
+                  <h3 id="selectedFlightTitle" data-i18n="selectFlight">Selecione um voo</h3>
                 </div>
-                <span class="tiny-pill" id="selectedFlightTag">Aguardando</span>
+                <span class="tiny-pill" id="selectedFlightTag">—</span>
               </div>
 
               <div class="selected-flight-card" id="selectedFlightCard">
-                <p>Toque em uma faixa ou contato radar para abrir comandos da aeronave.</p>
+                <p data-i18n="tapFlightHint">Toque em uma faixa ou contato radar para abrir comandos da aeronave.</p>
               </div>
 
-              <div class="command-grid" id="commandGrid">
-                <button class="command-button" data-command="altitudeUp" type="button">ALT +</button>
-                <button class="command-button" data-command="altitudeDown" type="button">ALT −</button>
-                <button class="command-button" data-command="speedUp" type="button">SPD +</button>
-                <button class="command-button" data-command="speedDown" type="button">SPD −</button>
-                <button class="command-button" data-command="vectorLeft" type="button">HDG ◀</button>
-                <button class="command-button" data-command="vectorRight" type="button">HDG ▶</button>
-                <button class="command-button" data-command="hold" type="button">HOLD</button>
-                <button class="command-button" data-command="priority" type="button">CLR APP</button>
-              </div>
+              <div class="quick-command-grid" id="quickCommandGrid"></div>
+
+              <label class="command-input-wrap">
+                <span class="eyebrow" data-i18n="atcTypewriter">Comando ATC estilo máquina de escrever</span>
+                <div class="command-input-row">
+                  <input id="commandInput" type="text" placeholder="APP / LAND / TAXI / TAKEOFF / ALT 5000 / HDG 270" autocomplete="off" />
+                  <button class="primary-button compact-button" id="sendCommandButton" type="button" data-i18n="transmit">Transmitir</button>
+                </div>
+              </label>
             </section>
           </div>
         </section>
 
-        <section class="screen" id="contentScreen" aria-labelledby="contentTitle">
+        <section class="screen" id="contentScreen">
           <section class="section-block glass-panel">
             <div class="section-head">
               <div>
-                <p class="eyebrow">Expansões e módulos</p>
-                <h2 id="contentTitle">Catálogo de conteúdo</h2>
-              </div>
-              <span class="tiny-pill" id="contentStatusTag">Sincronizado</span>
-            </div>
-            <div id="packageGrid" class="package-grid"></div>
-          </section>
-
-          <section class="section-block glass-panel">
-            <div class="section-head">
-              <div>
-                <p class="eyebrow">Configuração local</p>
-                <h3>Preferências do operador</h3>
+                <p class="eyebrow">Content</p>
+                <h2>DLC / Admin</h2>
               </div>
             </div>
-            <div class="preferences-grid">
-              <label class="toggle-card">
-                <input id="sfxToggle" type="checkbox" checked />
-                <span>Áudio tático</span>
-              </label>
-              <label class="toggle-card">
-                <input id="motionToggle" type="checkbox" />
-                <span>Reduzir movimento</span>
-              </label>
-              <button class="secondary-button" id="resetProfileButton" type="button">Resetar carreira local</button>
+            <p class="hero-text">Use o painel Admin para ativar ou editar pacotes de conteúdo. A arquitetura continua pronta para expansão por aeroporto, região ou companhia.</p>
+            <div class="hero-actions">
+              <a class="primary-button chrome-link" href="./admin.html">Abrir Admin</a>
             </div>
           </section>
         </section>
       </main>
 
       <nav class="bottom-nav glass-panel">
-        <button class="nav-chip active" type="button" data-screen="dashboard">Dashboard</button>
-        <button class="nav-chip" type="button" data-screen="game">Operação</button>
-        <button class="nav-chip" type="button" data-screen="content">Conteúdo</button>
+        <button class="nav-chip active" type="button" data-screen="dashboard" data-i18n="dashboard">Dashboard</button>
+        <button class="nav-chip" type="button" data-screen="game" data-i18n="operation">Operação</button>
+        <button class="nav-chip" type="button" data-screen="content" data-i18n="content">Conteúdo</button>
       </nav>
 
       <div id="toastLayer" class="toast-layer" aria-live="polite" aria-atomic="true"></div>

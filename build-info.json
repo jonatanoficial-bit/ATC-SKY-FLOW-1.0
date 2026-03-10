@@ -1,6 +1,11 @@
 {
-  "buildUtc": "2026-03-09 22:20:00 UTC",
-  "buildLocal": "09/03/2026 22:20:00",
+  "version": "2.1.0",
+  "buildLocal": "10/03/2026 13:01:02",
   "completion": "99%",
-  "version": "2.0.0"
+  "notes": [
+    "local radar by airport",
+    "bilingual radio typewriter",
+    "icao-inspired aircraft models",
+    "major real-world hubs"
+  ]
 }

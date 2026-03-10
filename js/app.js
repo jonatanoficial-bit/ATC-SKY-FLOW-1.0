@@ -1,17 +1,5 @@
-import {
-  loadProfile,
-  saveProfile,
-  applySessionResult,
-  getRankProgress,
-  packageUnlockedForProfile,
-  togglePackageForProfile,
-  resetProfile
-} from './core/profile-manager.js';
-import { ContentManager } from './core/content-manager.js';
 import { MapRenderer } from './game/map-renderer.js';
-import { SimulationEngine } from './game/simulation.js';
-import { SoundEngine } from './game/audio.js';
-import { formatClock } from './game/math.js';
+import { SimulationEngine, rankOrder } from './game/simulation.js';
 
 const refs = {
   screens: {
@@ -20,200 +8,350 @@ const refs = {
     content: document.getElementById('contentScreen')
   },
   navButtons: [...document.querySelectorAll('[data-screen]')],
-  rankPill: document.getElementById('rankPill'),
+  airportGrid: document.getElementById('airportGrid'),
+  airportCountTag: document.getElementById('airportCountTag'),
+  scenarioGrid: document.getElementById('scenarioGrid'),
+  selectedScenarioTag: document.getElementById('selectedScenarioTag'),
   startScenarioButton: document.getElementById('startScenarioButton'),
   openContentButton: document.getElementById('openContentButton'),
   pauseButton: document.getElementById('pauseButton'),
-  statsGrid: document.getElementById('statsGrid'),
-  scenarioGrid: document.getElementById('scenarioGrid'),
-  selectedScenarioTag: document.getElementById('selectedScenarioTag'),
-  airportGrid: document.getElementById('airportGrid'),
-  airportCountTag: document.getElementById('airportCountTag'),
+  rankPill: document.getElementById('rankPill'),
   heroAirport: document.getElementById('heroAirport'),
+  heroAirportMeta: document.getElementById('heroAirportMeta'),
   heroScenario: document.getElementById('heroScenario'),
-  heroActivePackages: document.getElementById('heroActivePackages'),
+  heroScenarioMeta: document.getElementById('heroScenarioMeta'),
   hudTime: document.getElementById('hudTime'),
   hudScore: document.getElementById('hudScore'),
   hudCalm: document.getElementById('hudCalm'),
   hudLandings: document.getElementById('hudLandings'),
+  hudHandoffs: document.getElementById('hudHandoffs'),
+  selectedAirportTitle: document.getElementById('selectedAirportTitle'),
+  selectedAirportTag: document.getElementById('selectedAirportTag'),
+  airportBrief: document.getElementById('airportBrief'),
+  radioLog: document.getElementById('radioLog'),
   liveFlightsCount: document.getElementById('liveFlightsCount'),
   flightStripList: document.getElementById('flightStripList'),
   selectedFlightTitle: document.getElementById('selectedFlightTitle'),
   selectedFlightTag: document.getElementById('selectedFlightTag'),
   selectedFlightCard: document.getElementById('selectedFlightCard'),
-  selectedAirportTitle: document.getElementById('selectedAirportTitle'),
-  selectedAirportTag: document.getElementById('selectedAirportTag'),
-  airportBrief: document.getElementById('airportBrief'),
-  alertStack: document.getElementById('alertStack'),
-  commandButtons: [...document.querySelectorAll('[data-command]')],
-  packageGrid: document.getElementById('packageGrid'),
-  contentStatusTag: document.getElementById('contentStatusTag'),
-  resetProfileButton: document.getElementById('resetProfileButton'),
-  sfxToggle: document.getElementById('sfxToggle'),
-  motionToggle: document.getElementById('motionToggle'),
+  quickCommandGrid: document.getElementById('quickCommandGrid'),
+  commandInput: document.getElementById('commandInput'),
+  sendCommandButton: document.getElementById('sendCommandButton'),
+  buildChip: document.getElementById('buildChip'),
+  completionChip: document.getElementById('completionChip'),
+  toastLayer: document.getElementById('toastLayer'),
   worldStage: document.getElementById('worldStage'),
   radarSvg: document.getElementById('radarSvg'),
   markerLayer: document.getElementById('markerLayer'),
-  buildChip: document.getElementById('buildChip'),
-  completionChip: document.getElementById('completionChip'),
-  toastLayer: document.getElementById('toastLayer')
+  languageToggle: document.getElementById('languageToggle'),
+  statsGrid: document.getElementById('statsGrid')
+};
+
+const dictionary = {
+  pt: {
+    premiumLabel: 'Simulação ATC premium',
+    pause: 'Pausar',
+    towerSelectEyebrow: 'Seleção de torre',
+    heroTitle: 'Escolha um aeroporto principal e opere apenas a TMA local como um controlador real.',
+    heroText: 'Entre em serviço em um hub real, receba chamadas em estilo máquina de escrever, coordene táxi, decolagem, aproximação e saída do espaço aéreo com radar local inspirado em ATC real.',
+    startOperation: 'Iniciar operação',
+    manageContent: 'Gerenciar conteúdo',
+    activeAirport: 'Aeroporto ativo',
+    activeScenario: 'Janela',
+    realismMode: 'Modo',
+    realismValue: 'Radar local + rádio bilíngue',
+    majorAirports: 'Aeroportos principais',
+    chooseTower: 'Escolha a torre que você vai operar',
+    operationWindows: 'Janelas operacionais',
+    chooseIntensity: 'Escolha a intensidade da sessão',
+    liveOperation: 'Operação em andamento',
+    time: 'Tempo',
+    score: 'Score',
+    calm: 'Calma',
+    landings: 'Pousos',
+    handoffs: 'Handoffs',
+    stable: 'Estável',
+    attention: 'Atenção',
+    conflict: 'Conflito',
+    selectedTower: 'Torre selecionada',
+    radioFeed: 'Rádio / CPDLC simplificado',
+    liveComms: 'Mensagens ao vivo',
+    activeTraffic: 'Tráfego ativo',
+    flightStrips: 'Flight strips',
+    directControl: 'Controle direto',
+    selectFlight: 'Selecione um voo',
+    tapFlightHint: 'Toque em uma faixa ou contato radar para abrir comandos da aeronave.',
+    atcTypewriter: 'Comando ATC estilo máquina de escrever',
+    transmit: 'Transmitir',
+    dashboard: 'Dashboard',
+    operation: 'Operação',
+    content: 'Conteúdo',
+    low: 'baixo',
+    activeFlights: '{{count}} voos',
+    rankNames: { cadet: 'Cadete', controller: 'Controlador', director: 'Diretor', chief: 'Chief ATC' },
+    rankLabel: '{{rank}} • XP {{xp}}',
+    statsSessions: 'Sessões',
+    statsCredits: 'Créditos',
+    statsBest: 'Melhor score',
+    statsCompletion: 'Conclusão média',
+    selectedScenarioFallback: 'Base',
+    towerTag: '{{icao}} · TMA {{tma}}nm',
+    airportBrief1: 'Pistas ativas: {{arr}} ARR / {{dep}} DEP',
+    airportBrief2: 'Freq.: TWR {{tower}} · APP {{app}} · GND {{ground}}',
+    airportBrief3: 'TA {{alt}}ft · Elev. {{elev}}ft · {{tz}}',
+    airportBrief4: 'Chegadas: {{arrfix}} · Saídas: {{depfix}}',
+    stripStatus: '{{status}} · {{alt}}ft · {{spd}}kt',
+    noSession: 'Sem sessão',
+    commandSentToast: 'Mensagem transmitida',
+    sessionComplete: 'Sessão concluída',
+    welcomeRadio: 'Selecione uma torre, escolha uma janela e assuma a posição.',
+    stripArrival: 'Chegada',
+    stripDeparture: 'Saída'
+  },
+  en: {
+    premiumLabel: 'Premium ATC simulation',
+    pause: 'Pause',
+    towerSelectEyebrow: 'Tower selection',
+    heroTitle: 'Choose a major airport and operate only the local TMA like a real controller.',
+    heroText: 'Go on position at a real hub, receive typewriter-style calls, coordinate taxi, departure, approach and airspace exit with a local radar inspired by real ATC displays.',
+    startOperation: 'Start operation',
+    manageContent: 'Manage content',
+    activeAirport: 'Active airport',
+    activeScenario: 'Window',
+    realismMode: 'Mode',
+    realismValue: 'Local radar + bilingual radio',
+    majorAirports: 'Major airports',
+    chooseTower: 'Choose the tower you will operate',
+    operationWindows: 'Operational windows',
+    chooseIntensity: 'Choose session intensity',
+    liveOperation: 'Live operation',
+    time: 'Time',
+    score: 'Score',
+    calm: 'Calm',
+    landings: 'Landings',
+    handoffs: 'Handoffs',
+    stable: 'Stable',
+    attention: 'Attention',
+    conflict: 'Conflict',
+    selectedTower: 'Selected tower',
+    radioFeed: 'Radio / simplified CPDLC',
+    liveComms: 'Live messages',
+    activeTraffic: 'Active traffic',
+    flightStrips: 'Flight strips',
+    directControl: 'Direct control',
+    selectFlight: 'Select a flight',
+    tapFlightHint: 'Tap a strip or radar contact to open aircraft controls.',
+    atcTypewriter: 'ATC typewriter command',
+    transmit: 'Transmit',
+    dashboard: 'Dashboard',
+    operation: 'Operation',
+    content: 'Content',
+    low: 'low',
+    activeFlights: '{{count}} flights',
+    rankNames: { cadet: 'Cadet', controller: 'Controller', director: 'Director', chief: 'Chief ATC' },
+    rankLabel: '{{rank}} • XP {{xp}}',
+    statsSessions: 'Sessions',
+    statsCredits: 'Credits',
+    statsBest: 'Best score',
+    statsCompletion: 'Average completion',
+    selectedScenarioFallback: 'Base',
+    towerTag: '{{icao}} · TMA {{tma}}nm',
+    airportBrief1: 'Active runways: {{arr}} ARR / {{dep}} DEP',
+    airportBrief2: 'Freq.: TWR {{tower}} · APP {{app}} · GND {{ground}}',
+    airportBrief3: 'TA {{alt}}ft · Elev. {{elev}}ft · {{tz}}',
+    airportBrief4: 'Arrivals: {{arrfix}} · Departures: {{depfix}}',
+    stripStatus: '{{status}} · {{alt}}ft · {{spd}}kt',
+    noSession: 'No session',
+    commandSentToast: 'Message transmitted',
+    sessionComplete: 'Session complete',
+    welcomeRadio: 'Select a tower, choose a window and go on position.',
+    stripArrival: 'Arrival',
+    stripDeparture: 'Departure'
+  }
+};
+
+const storageKey = 'skyflow-control-profile-v2';
+const defaultProfile = {
+  xp: 0,
+  credits: 0,
+  sessions: 0,
+  bestScore: 0,
+  completionAverage: 0,
+  language: 'pt',
+  unlockedRank: 'cadet'
 };
 
 const state = {
   profile: loadProfile(),
-  catalog: null,
-  selectedScenarioId: null,
+  airports: [],
+  scenarios: [],
   selectedAirportId: null,
+  selectedScenarioId: null,
   selectedFlightId: null,
   activeScreen: 'dashboard',
-  activeSession: null,
-  alerts: [],
-  packageData: [],
   buildInfo: null,
-  resultApplied: false
+  sessionApplied: false,
+  lastFrame: 0
 };
 
-const contentManager = new ContentManager('./content');
-const audioEngine = new SoundEngine(state.profile.settings?.sfx !== false);
 const renderer = new MapRenderer({
   stage: refs.worldStage,
   radarSvg: refs.radarSvg,
   markerLayer: refs.markerLayer,
   onSelectFlight: (flightId) => {
     state.selectedFlightId = flightId;
-    renderer.selectFlight(flightId);
-    renderSelectedFlight();
+    renderFlightSelection();
   }
 });
+
 const simulation = new SimulationEngine({
   onEvent: (event) => {
-    state.alerts = [event, ...state.alerts].slice(0, 8);
-    if (event.type === 'conflict') audioEngine.play('conflict');
-    else if (event.type === 'warning') audioEngine.play('warning');
-    else if (event.type === 'landed') audioEngine.play('landed');
-    else audioEngine.play('command');
-    renderAlerts();
     pushToast(event.message);
-  }
+    if (event.type === 'session_end' && !state.sessionApplied) {
+      applySessionResult();
+    }
+  },
+  onRadio: (entry) => appendRadioEntry(entry)
 });
 
-const airportUnlockedForProfile = (airport) => {
-  const rankOrder = ['cadet', 'controller', 'director', 'chief'];
-  const current = getRankProgress(state.profile).currentRank.id;
-  const need = airport.unlockRank || 'cadet';
-  return rankOrder.indexOf(current) >= rankOrder.indexOf(need);
-};
+function loadProfile() {
+  try {
+    return { ...defaultProfile, ...JSON.parse(localStorage.getItem(storageKey) || '{}') };
+  } catch {
+    return { ...defaultProfile };
+  }
+}
 
-const setScreen = (screenId) => {
-  state.activeScreen = screenId;
-  Object.entries(refs.screens).forEach(([key, element]) => {
-    element.classList.toggle('active', key === screenId);
+function saveProfile() {
+  localStorage.setItem(storageKey, JSON.stringify(state.profile));
+}
+
+function t(key, vars = {}) {
+  const lang = state.profile.language;
+  let value = dictionary[lang][key] || dictionary.pt[key] || key;
+  if (typeof value === 'object') return value;
+  Object.entries(vars).forEach(([name, replacement]) => {
+    value = value.replaceAll(`{{${name}}}`, replacement);
   });
+  return value;
+}
+
+function currentAirport() {
+  return state.airports.find((airport) => airport.id === state.selectedAirportId) || null;
+}
+
+function currentScenario() {
+  return state.scenarios.find((scenario) => scenario.id === state.selectedScenarioId) || null;
+}
+
+function currentSession() {
+  return simulation.getState();
+}
+
+function currentFlight() {
+  return currentSession()?.flights?.find((flight) => flight.id === state.selectedFlightId) || null;
+}
+
+function getCurrentRank() {
+  const xp = state.profile.xp;
+  if (xp >= 4200) return 'chief';
+  if (xp >= 2600) return 'director';
+  if (xp >= 1200) return 'controller';
+  return 'cadet';
+}
+
+function airportUnlocked(airport) {
+  const currentIndex = rankOrder.indexOf(getCurrentRank());
+  return currentIndex >= rankOrder.indexOf(airport.unlockRank || 'cadet');
+}
+
+function setScreen(screenId) {
+  state.activeScreen = screenId;
+  Object.entries(refs.screens).forEach(([key, screen]) => screen.classList.toggle('active', key === screenId));
   refs.navButtons.forEach((button) => button.classList.toggle('active', button.dataset.screen === screenId));
-};
+}
 
-const selectedAirport = () => state.catalog?.airports?.find((airport) => airport.id === state.selectedAirportId) || null;
-const selectedScenario = () => state.catalog?.scenarios?.find((scenario) => scenario.id === state.selectedScenarioId) || null;
-const selectedFlight = () => state.activeSession?.flights?.find((flight) => flight.id === state.selectedFlightId) || null;
+function formatTime(seconds) {
+  const mins = Math.floor(seconds / 60).toString().padStart(2, '0');
+  const secs = Math.floor(seconds % 60).toString().padStart(2, '0');
+  return `${mins}:${secs}`;
+}
 
-const pushToast = (message) => {
+function pushToast(message) {
   const toast = document.createElement('div');
   toast.className = 'toast';
   toast.textContent = message;
   refs.toastLayer.appendChild(toast);
-  setTimeout(() => toast.remove(), 2500);
-};
+  setTimeout(() => toast.remove(), 2600);
+}
 
-const renderBuildInfo = async () => {
+function applyTranslations() {
+  document.documentElement.lang = state.profile.language === 'pt' ? 'pt-BR' : 'en';
+  document.querySelectorAll('[data-i18n]').forEach((element) => {
+    const key = element.dataset.i18n;
+    element.textContent = t(key);
+  });
+  refs.commandInput.placeholder = state.profile.language === 'pt'
+    ? 'APP / LAND / TAXI / TAKEOFF / ALT 5000 / HDG 270'
+    : 'APP / LAND / TAXI / TAKEOFF / ALT 5000 / HDG 270';
+}
+
+async function loadData() {
+  const [airports, scenarios] = await Promise.all([
+    fetch('./content/core/airports.json').then((res) => res.json()),
+    fetch('./content/core/scenarios.json').then((res) => res.json())
+  ]);
+  state.airports = airports;
+  state.scenarios = scenarios;
+  state.selectedAirportId = airports.find(airportUnlocked)?.id || airports[0]?.id || null;
+  state.selectedScenarioId = scenarios[0]?.id || null;
+}
+
+async function renderBuildInfo() {
   try {
     const info = await fetch('./build-info.json', { cache: 'no-store' }).then((res) => res.json());
     state.buildInfo = info;
     refs.buildChip.textContent = `Build ${info.version} • ${info.buildLocal}`;
-    refs.completionChip.textContent = `Conclusão: ${info.completion}`;
+    refs.completionChip.textContent = `${state.profile.language === 'pt' ? 'Conclusão' : 'Completion'}: ${info.completion}`;
   } catch {
-    refs.buildChip.textContent = 'Build local indisponível';
-    refs.completionChip.textContent = 'Conclusão: --';
+    refs.buildChip.textContent = 'Build local';
+    refs.completionChip.textContent = '--';
   }
-};
+}
 
-const renderStats = () => {
-  const progress = getRankProgress(state.profile);
-  const next = progress.nextRank?.name || 'Máximo';
-  const cards = [
-    { label: 'Rank', value: progress.currentRank.name, meta: `Próximo: ${next}` },
-    { label: 'XP total', value: state.profile.xp, meta: `Progresso: ${Math.round(progress.progress * 100)}%` },
-    { label: 'Créditos', value: state.profile.credits, meta: 'Economia local do operador' },
-    { label: 'Sessões / pousos', value: `${state.profile.sessions} / ${state.profile.totalLandings}`, meta: `Recorde: ${state.profile.bestScore}` }
-  ];
-  refs.statsGrid.innerHTML = cards
-    .map(
-      (card) => `
-        <article class="hero-stat-card">
-          <span class="stat-label">${card.label}</span>
-          <strong>${card.value}</strong>
-          <small class="small-label">${card.meta}</small>
-        </article>
-      `
-    )
+function renderStats() {
+  const rank = getCurrentRank();
+  refs.rankPill.textContent = t('rankLabel', { rank: dictionary[state.profile.language].rankNames[rank], xp: state.profile.xp });
+  refs.statsGrid.innerHTML = [
+    [t('statsSessions'), state.profile.sessions],
+    [t('statsCredits'), state.profile.credits],
+    [t('statsBest'), state.profile.bestScore],
+    [t('statsCompletion'), `${state.profile.completionAverage || 0}%`]
+  ]
+    .map(([label, value]) => `<article class="hero-stat-card"><span class="stat-label">${label}</span><strong>${value}</strong></article>`)
     .join('');
-  refs.rankPill.textContent = `${progress.currentRank.badge} ${progress.currentRank.name} • ${Math.round(progress.progress * 100)}%`;
-};
+}
 
-const renderScenarios = () => {
-  const current = selectedScenario();
-  refs.heroScenario.textContent = current?.title || 'Selecione uma janela';
-  refs.selectedScenarioTag.textContent = current?.difficulty || 'Pronto';
-  refs.scenarioGrid.innerHTML = state.catalog.scenarios
-    .map((scenario) => {
-      const locked = !airportUnlockedForProfile({ unlockRank: scenario.rankRequired || 'cadet' });
-      return `
-        <button class="scenario-card ${scenario.id === state.selectedScenarioId ? 'selected' : ''} ${locked ? 'locked' : ''}" data-scenario-id="${scenario.id}" type="button" ${locked ? 'disabled' : ''}>
-          <div class="scenario-head">
-            <strong class="scenario-title">${scenario.title}</strong>
-            <span class="tiny-pill">${scenario.difficulty}</span>
-          </div>
-          <p>${scenario.blurb}</p>
-          <div class="scenario-tags">
-            <span class="tiny-pill">Meta ${scenario.targetScore}</span>
-            <span class="tiny-pill">${scenario.duration}s</span>
-            <span class="tiny-pill">Máx ${scenario.maxActive} voos</span>
-          </div>
-        </button>
-      `;
-    })
-    .join('');
-  refs.scenarioGrid.querySelectorAll('[data-scenario-id]').forEach((button) => {
-    button.addEventListener('click', () => {
-      state.selectedScenarioId = button.dataset.scenarioId;
-      renderScenarios();
-      updateHero();
-    });
-  });
-};
-
-const renderAirports = () => {
-  const airports = state.catalog.airports.filter((airport) => airportUnlockedForProfile(airport));
-  refs.airportCountTag.textContent = `${airports.length} torres`;
+function renderAirports() {
+  const airports = state.airports.filter(airportUnlocked);
+  refs.airportCountTag.textContent = `${airports.length}`;
   refs.airportGrid.innerHTML = airports
     .map((airport) => {
       const selected = airport.id === state.selectedAirportId;
-      const runwayText = (airport.runways || []).map((runway) => runway.id).join(' • ');
       return `
         <button class="airport-card ${selected ? 'selected' : ''}" data-airport-id="${airport.id}" type="button">
           <div class="airport-head">
             <div>
               <div class="airport-code">${airport.iata}</div>
-              <div class="airport-meta">${airport.name} • ${airport.city}, ${airport.country}</div>
+              <div class="airport-meta">${airport.icao} · ${airport.city}, ${airport.country}</div>
             </div>
-            <span class="tiny-pill">${airport.trafficLabel || 'Hub'}</span>
+            <span class="tiny-pill">${airport.trafficLabel}</span>
           </div>
+          <p class="airport-description">${airport.description}</p>
           <div class="airport-tags">
-            <span class="tiny-pill">${airport.icao}</span>
+            <span class="tiny-pill">${airport.runways[0].id}</span>
+            <span class="tiny-pill">${airport.runways[1].id}</span>
             <span class="tiny-pill">TMA ${airport.tmaRadiusNm}nm</span>
-            <span class="tiny-pill">${runwayText}</span>
-          </div>
-          <div class="airport-fixes">
-            ${(airport.fixes || []).slice(0, 4).map((fix) => `<span class="tiny-pill">${fix.name}</span>`).join('')}
           </div>
         </button>
       `;
@@ -222,265 +360,276 @@ const renderAirports = () => {
   refs.airportGrid.querySelectorAll('[data-airport-id]').forEach((button) => {
     button.addEventListener('click', () => {
       state.selectedAirportId = button.dataset.airportId;
-      state.profile.selectedAirportId = state.selectedAirportId;
-      saveProfile(state.profile);
-      renderAirports();
-      updateHero();
-      renderAirportBrief(selectedAirport());
+      renderAll();
     });
   });
-};
+}
 
-const renderAirportBrief = (airport) => {
-  if (!airport) {
-    refs.selectedAirportTitle.textContent = 'Aguardando seleção';
-    refs.selectedAirportTag.textContent = 'TMA';
-    refs.airportBrief.innerHTML = '<div class="airport-brief-item"><p>Selecione uma torre para carregar o radar local e os dados operacionais.</p></div>';
-    return;
-  }
-  refs.selectedAirportTitle.textContent = `${airport.icao} • ${airport.name}`;
-  refs.selectedAirportTag.textContent = `${airport.tmaRadiusNm}nm`;
-  refs.airportBrief.innerHTML = `
-    <div class="airport-brief-item"><strong>${airport.city}, ${airport.country}</strong><p>${airport.description || 'Radar terminal com chegadas e saídas reais simplificadas.'}</p></div>
-    <div class="airport-brief-item"><strong>Pistas</strong><p>${airport.runways.map((runway) => `${runway.id} (${runway.heading}°)`).join(' • ')}</p></div>
-    <div class="airport-brief-item"><strong>Fixos principais</strong><p>${airport.fixes.map((fix) => `${fix.name} ${fix.type === 'arrival' ? 'ARR' : fix.type === 'departure' ? 'DEP' : 'MIX'}`).join(' • ')}</p></div>
-  `;
-};
-
-const renderPackages = () => {
-  refs.heroActivePackages.textContent = `${state.catalog.activePackages.length}`;
-  refs.packageGrid.innerHTML = state.catalog.packages
-    .map((pkg) => {
-      const active = state.profile.activePackages?.includes(pkg.id) || pkg.id === 'core';
-      const unlocked = packageUnlockedForProfile(pkg, state.profile);
-      return `
-        <article class="package-card ${unlocked ? '' : 'locked'}">
-          <div class="section-head compact">
-            <div>
-              <strong>${pkg.title}</strong>
-              <p>${pkg.description}</p>
-            </div>
-            <span class="tiny-pill">${pkg.version || '1.0.0'}</span>
-          </div>
-          <div class="package-tags">
-            <span class="tiny-pill">${pkg.stats.airports} aeroportos</span>
-            <span class="tiny-pill">${pkg.stats.scenarios} cenários</span>
-            <span class="tiny-pill">${pkg.type}</span>
-          </div>
-          <footer>
-            <span class="small-label">Rank: ${pkg.unlockRank || 'cadet'}</span>
-            <button class="secondary-button" data-package-id="${pkg.id}" ${pkg.id === 'core' || !unlocked ? 'disabled' : ''}>${active ? 'Desativar' : 'Ativar'}</button>
-          </footer>
-        </article>
-      `;
-    })
+function renderScenarios() {
+  const available = state.scenarios.filter((scenario) => rankOrder.indexOf(getCurrentRank()) >= rankOrder.indexOf(scenario.rankRequired || 'cadet'));
+  refs.selectedScenarioTag.textContent = currentScenario()?.difficulty || t('selectedScenarioFallback');
+  refs.scenarioGrid.innerHTML = available
+    .map((scenario) => `
+      <button class="scenario-card ${scenario.id === state.selectedScenarioId ? 'selected' : ''}" data-scenario-id="${scenario.id}" type="button">
+        <div class="scenario-head">
+          <strong class="scenario-title">${scenario.title}</strong>
+          <span class="tiny-pill">${scenario.difficulty}</span>
+        </div>
+        <p>${scenario.blurb}</p>
+        <div class="airport-tags">
+          <span class="tiny-pill">${scenario.duration}s</span>
+          <span class="tiny-pill">MAX ${scenario.maxActive}</span>
+          <span class="tiny-pill">${scenario.targetScore} pts</span>
+        </div>
+      </button>
+    `)
     .join('');
-
-  refs.packageGrid.querySelectorAll('[data-package-id]').forEach((button) => {
+  refs.scenarioGrid.querySelectorAll('[data-scenario-id]').forEach((button) => {
     button.addEventListener('click', () => {
-      const packageId = button.dataset.packageId;
-      const enabled = !(state.profile.activePackages || []).includes(packageId);
-      state.profile = togglePackageForProfile(state.profile, packageId, enabled);
-      refreshCatalog();
+      state.selectedScenarioId = button.dataset.scenarioId;
+      renderAll();
     });
   });
-};
+}
 
-const renderAlerts = () => {
-  refs.alertStack.innerHTML = state.alerts.length
-    ? state.alerts
-        .map(
-          (alert) => `<article class="alert-item ${alert.type}"><strong>${alert.type.toUpperCase()}</strong><p>${alert.message}</p></article>`
-        )
-        .join('')
-    : '<article class="alert-item"><strong>Radar pronto</strong><p>Sem alertas no momento.</p></article>';
-};
+function renderHero() {
+  const airport = currentAirport();
+  const scenario = currentScenario();
+  refs.heroAirport.textContent = airport ? `${airport.iata} · ${airport.name}` : '—';
+  refs.heroAirportMeta.textContent = airport ? `${airport.icao} · ${airport.city}` : '—';
+  refs.heroScenario.textContent = scenario?.title || '—';
+  refs.heroScenarioMeta.textContent = scenario ? `${scenario.difficulty} · ${scenario.duration}s` : '—';
+}
 
-const renderSelectedFlight = () => {
-  const flight = selectedFlight();
-  refs.commandButtons.forEach((button) => (button.disabled = !flight));
-  if (!flight) {
-    refs.selectedFlightTitle.textContent = 'Selecione um voo';
-    refs.selectedFlightTag.textContent = 'Aguardando';
-    refs.selectedFlightCard.innerHTML = '<p>Toque em uma faixa ou contato radar para abrir comandos da aeronave.</p>';
-    renderer.selectFlight(null);
-    return;
-  }
-  refs.selectedFlightTitle.textContent = flight.callsign;
-  refs.selectedFlightTag.textContent = `${flight.kind === 'arrival' ? 'ARR' : 'DEP'} • ${flight.runway.id}`;
-  refs.selectedFlightCard.innerHTML = `
-    <strong>${flight.callsign}</strong>
-    <p>${flight.kind === 'arrival' ? 'Chegada' : 'Saída'} via ${flight.fix?.name || 'vetoração local'}</p>
-    <p>ALT alvo ${Math.round(flight.targetAltitudeFt)}ft • SPD alvo ${Math.round(flight.targetSpeedKt)}kt • HDG ${Math.round(flight.targetHeading)}°</p>
-    <small>${flight.holdMode ? 'Holding ativo' : flight.cleared ? 'Aproximação priorizada' : 'Monitoramento padrão'}</small>
-  `;
-  renderer.selectFlight(flight.id);
-};
+function renderAirportBrief() {
+  const airport = currentAirport();
+  if (!airport) return;
+  refs.selectedAirportTitle.textContent = `${airport.name}`;
+  refs.selectedAirportTag.textContent = t('towerTag', { icao: airport.icao, tma: airport.tmaRadiusNm });
+  const arrivals = airport.fixes.filter((fix) => fix.type === 'arrival').map((fix) => fix.name).join(' · ');
+  const departures = airport.fixes.filter((fix) => fix.type === 'departure').map((fix) => fix.name).join(' · ');
+  refs.airportBrief.innerHTML = [
+    t('airportBrief1', { arr: airport.preferredConfig.arrivalRunway, dep: airport.preferredConfig.departureRunway }),
+    t('airportBrief2', { tower: airport.frequencies.tower, app: airport.frequencies.approach, ground: airport.frequencies.ground }),
+    t('airportBrief3', { alt: airport.transitionAltitudeFt, elev: airport.elevationFt, tz: airport.timezone }),
+    t('airportBrief4', { arrfix: arrivals, depfix: departures })
+  ].map((line) => `<div class="airport-brief-item">${line}</div>`).join('');
+}
 
-const renderFlightStrips = () => {
-  const flights = state.activeSession?.flights || [];
-  refs.liveFlightsCount.textContent = `${flights.length} voos`;
-  refs.flightStripList.innerHTML = flights.length
-    ? flights
-        .map(
-          (flight) => `
-            <button class="flight-strip ${flight.id === state.selectedFlightId ? 'selected' : ''}" type="button" data-flight-id="${flight.id}">
-              <div class="flight-strip-top">
-                <strong>${flight.callsign}</strong>
-                <span class="tiny-pill">${flight.kind === 'arrival' ? 'ARR' : 'DEP'}</span>
-              </div>
-              <div class="flight-strip-tags">
-                <span class="tiny-pill">FL${String(Math.round(flight.altitudeFt / 100)).padStart(3, '0')}</span>
-                <span class="tiny-pill">${Math.round(flight.speedKt)}KT</span>
-                <span class="tiny-pill">HDG ${Math.round(flight.heading)}°</span>
-              </div>
-              <small>${flight.fix?.name || 'Vector'} • ${flight.runway.id}</small>
-            </button>
-          `
-        )
-        .join('')
-    : '<div class="airport-brief-item"><p>Nenhum tráfego ativo.</p></div>';
+function renderSession() {
+  const session = currentSession();
+  const airport = currentAirport();
+  renderer.render(airport, session?.flights || [], state.profile.language);
+  refs.liveFlightsCount.textContent = t('activeFlights', { count: session?.flights?.length || 0 });
+  refs.hudTime.textContent = formatTime(session?.elapsed || 0);
+  refs.hudScore.textContent = Math.round(session?.score || 0);
+  refs.hudCalm.textContent = `${Math.round(session?.calm || 100)}%`;
+  refs.hudLandings.textContent = session?.landings || 0;
+  refs.hudHandoffs.textContent = session?.handoffs || 0;
+  renderFlightStrips();
+  renderFlightSelection();
+}
+
+function renderFlightStrips() {
+  const session = currentSession();
+  const flights = session?.flights || [];
+  refs.flightStripList.innerHTML = flights.map((flight) => `
+    <button class="flight-strip ${flight.id === state.selectedFlightId ? 'selected' : ''}" data-flight-id="${flight.id}" type="button">
+      <div class="flight-strip-head">
+        <strong>${flight.callsign}</strong>
+        <span class="tiny-pill">${flight.kind === 'arrival' ? t('stripArrival') : t('stripDeparture')}</span>
+      </div>
+      <div class="flight-strip-row">${flight.model} · ${flight.fix.name} · ${flight.colorState.toUpperCase()}</div>
+      <div class="flight-strip-row">${t('stripStatus', { status: flight.status, alt: Math.round(flight.altitudeFt), spd: Math.round(flight.speedKt) })}</div>
+    </button>
+  `).join('');
   refs.flightStripList.querySelectorAll('[data-flight-id]').forEach((button) => {
     button.addEventListener('click', () => {
       state.selectedFlightId = button.dataset.flightId;
+      renderer.selectFlight(state.selectedFlightId);
+      renderFlightSelection();
       renderFlightStrips();
-      renderSelectedFlight();
     });
   });
-};
+}
 
-const updateHero = () => {
-  const airport = selectedAirport();
-  const scenario = selectedScenario();
-  refs.heroAirport.textContent = airport ? `${airport.icao} • ${airport.city}` : 'Selecione uma torre';
-  refs.heroScenario.textContent = scenario?.title || 'Selecione uma janela';
-};
-
-const renderGame = () => {
-  const session = state.activeSession?.session;
-  const airport = state.activeSession?.airport;
-  if (!session || !airport) return;
-  refs.hudTime.textContent = formatClock(session.timeRemaining);
-  refs.hudScore.textContent = Math.round(session.score);
-  refs.hudCalm.textContent = `${Math.round(session.calm)}%`;
-  refs.hudLandings.textContent = session.landings;
-  renderFlightStrips();
-  renderSelectedFlight();
-  renderAirportBrief(airport);
-  renderer.render(state.activeSession);
-
-  if (session.status === 'completed' && !state.resultApplied) {
-    state.profile = applySessionResult(state.profile, {
-      score: Math.round(session.score),
-      landings: session.landings,
-      conflicts: session.conflicts,
-      calm: Math.round(session.calm)
-    });
-    state.resultApplied = true;
-    renderStats();
-    renderPackages();
-    renderAirports();
-    pushToast('Resultado aplicado na carreira local.');
+function quickCommandsForFlight(flight) {
+  if (!flight) return [];
+  if (flight.kind === 'arrival') {
+    return ['ALT 5000', 'HDG 270', 'SPD 180', 'APP', 'LAND', 'HOLD'];
   }
-};
+  if (flight.phase === 'request-taxi') return ['TAXI'];
+  if (flight.phase === 'ready-departure') return ['TAKEOFF', 'HDG 270', 'ALT 5000'];
+  return ['HDG 270', 'ALT 5000', 'SPD 220', 'HANDOFF'];
+}
 
-const refreshCatalog = async () => {
-  const packages = await contentManager.loadCatalog();
-  state.packageData = packages;
-  state.catalog = contentManager.resolve(state.profile);
-  state.selectedScenarioId = state.selectedScenarioId || state.catalog.scenarios[0]?.id || null;
-  state.selectedAirportId = state.selectedAirportId || state.profile.selectedAirportId || state.catalog.airports[0]?.id || null;
-  renderStats();
-  renderScenarios();
-  renderAirports();
-  renderPackages();
-  updateHero();
-  renderAirportBrief(selectedAirport());
-};
-
-const startOperation = async () => {
-  const airport = selectedAirport();
-  const scenario = selectedScenario();
-  if (!airport || !scenario) {
-    pushToast('Selecione um aeroporto e um cenário antes de iniciar.');
+function renderFlightSelection() {
+  const flight = currentFlight();
+  renderer.selectFlight(flight?.id || null);
+  if (!flight) {
+    refs.selectedFlightTitle.textContent = t('selectFlight');
+    refs.selectedFlightTag.textContent = '—';
+    refs.selectedFlightCard.innerHTML = `<p>${t('tapFlightHint')}</p>`;
+    refs.quickCommandGrid.innerHTML = '';
     return;
   }
-  await audioEngine.resume();
-  state.alerts = [];
-  state.selectedFlightId = null;
-  state.resultApplied = false;
-  simulation.start({ airport, scenario, config: state.catalog.config });
-  renderer.setScenario({ airport });
-  refs.pauseButton.disabled = false;
-  refs.pauseButton.textContent = 'Pausar';
-  state.activeSession = simulation.getState();
-  renderAlerts();
-  renderGame();
-  setScreen('game');
-};
-
-const bindEvents = () => {
-  refs.navButtons.forEach((button) => {
-    button.addEventListener('click', () => setScreen(button.dataset.screen));
-  });
-
-  refs.startScenarioButton.addEventListener('click', startOperation);
-  refs.openContentButton.addEventListener('click', () => setScreen('content'));
-  refs.pauseButton.addEventListener('click', () => {
-    const paused = simulation.togglePause();
-    refs.pauseButton.textContent = paused ? 'Retomar' : 'Pausar';
-  });
-  refs.resetProfileButton.addEventListener('click', () => {
-    state.profile = resetProfile();
-    state.selectedAirportId = null;
-    refreshCatalog();
-    pushToast('Carreira local resetada.');
-  });
-  refs.sfxToggle.checked = state.profile.settings?.sfx !== false;
-  refs.motionToggle.checked = state.profile.settings?.reducedMotion === true;
-  refs.sfxToggle.addEventListener('change', (event) => {
-    state.profile.settings.sfx = event.target.checked;
-    audioEngine.setEnabled(event.target.checked);
-    saveProfile(state.profile);
-  });
-  refs.motionToggle.addEventListener('change', (event) => {
-    state.profile.settings.reducedMotion = event.target.checked;
-    saveProfile(state.profile);
-    document.documentElement.style.setProperty('--motion-scale', event.target.checked ? '0' : '1');
-  });
-
-  refs.commandButtons.forEach((button) => {
+  refs.selectedFlightTitle.textContent = `${flight.callsign} · ${flight.model}`;
+  refs.selectedFlightTag.textContent = `${flight.kind.toUpperCase()} · ${flight.status}`;
+  refs.selectedFlightCard.innerHTML = `
+    <div class="flight-detail-grid">
+      <div><span>ICAO</span><strong>${flight.model}</strong></div>
+      <div><span>ALT</span><strong>${Math.round(flight.altitudeFt)} ft</strong></div>
+      <div><span>SPD</span><strong>${Math.round(flight.speedKt)} kt</strong></div>
+      <div><span>HDG</span><strong>${Math.round(flight.heading).toString().padStart(3, '0')}</strong></div>
+      <div><span>FIX</span><strong>${flight.fix.name}</strong></div>
+      <div><span>PHASE</span><strong>${flight.phase}</strong></div>
+    </div>
+  `;
+  refs.quickCommandGrid.innerHTML = quickCommandsForFlight(flight)
+    .map((command) => `<button class="command-button" type="button" data-quick-command="${command}">${command}</button>`)
+    .join('');
+  refs.quickCommandGrid.querySelectorAll('[data-quick-command]').forEach((button) => {
     button.addEventListener('click', () => {
-      if (!state.selectedFlightId) return;
-      simulation.issueCommand(button.dataset.command, state.selectedFlightId);
-      state.activeSession = simulation.getState();
-      renderGame();
+      refs.commandInput.value = button.dataset.quickCommand;
+      sendCommand();
     });
   });
-};
+}
 
-const loop = (last = performance.now()) => {
-  const now = performance.now();
-  const dt = Math.min(0.05, (now - last) / 1000);
-  const session = simulation.update(dt);
-  if (session?.airport) {
-    state.activeSession = session;
-    if (!state.selectedFlightId || !session.flights.some((flight) => flight.id === state.selectedFlightId)) {
-      state.selectedFlightId = session.flights[0]?.id || null;
-    }
-    renderGame();
+const typewriterQueue = [];
+let typewriterBusy = false;
+
+function appendRadioEntry(entry) {
+  typewriterQueue.push(entry);
+  if (!typewriterBusy) processTypewriterQueue();
+}
+
+function processTypewriterQueue() {
+  const next = typewriterQueue.shift();
+  if (!next) {
+    typewriterBusy = false;
+    return;
   }
-  requestAnimationFrame(() => loop(now));
-};
+  typewriterBusy = true;
+  const line = document.createElement('div');
+  line.className = `radio-line ${next.side}`;
+  const stamp = document.createElement('small');
+  stamp.textContent = next.side === 'pilot' ? 'PILOT' : next.side === 'atc' ? 'ATC' : 'SYS';
+  const body = document.createElement('div');
+  body.textContent = '';
+  line.appendChild(stamp);
+  line.appendChild(body);
+  refs.radioLog.prepend(line);
+  const text = next.message;
+  let index = 0;
+  const timer = setInterval(() => {
+    body.textContent += text[index] || '';
+    index += 1;
+    if (index >= text.length) {
+      clearInterval(timer);
+      processTypewriterQueue();
+    }
+  }, 10);
+}
 
-const init = async () => {
-  bindEvents();
-  await renderer.init();
+function sendCommand() {
+  const flight = currentFlight();
+  if (!flight) return;
+  const text = refs.commandInput.value.trim();
+  if (!text) return;
+  const result = simulation.issueCommand(flight.id, text);
+  if (result.ok) {
+    appendRadioEntry({ side: 'atc', message: `${flight.callsign}, ${text}` });
+    pushToast(t('commandSentToast'));
+    refs.commandInput.value = '';
+  } else {
+    pushToast(result.message);
+  }
+}
+
+function startSession() {
+  const airport = currentAirport();
+  const scenario = currentScenario();
+  if (!airport || !scenario) return;
+  state.sessionApplied = false;
+  state.selectedFlightId = null;
+  refs.radioLog.innerHTML = '';
+  appendRadioEntry({ side: 'system', message: t('welcomeRadio') });
+  simulation.startSession({ airport, scenario, language: state.profile.language, profile: state.profile });
+  refs.pauseButton.disabled = false;
+  refs.pauseButton.textContent = t('pause');
+  setScreen('game');
+  renderAirportBrief();
+  renderSession();
+}
+
+function applySessionResult() {
+  const session = currentSession();
+  if (!session || state.sessionApplied) return;
+  state.sessionApplied = true;
+  state.profile.sessions += 1;
+  state.profile.xp += Math.round(session.score * 0.45 + session.landings * 14 + session.handoffs * 10);
+  state.profile.credits += Math.round(session.score * 0.2 + session.landings * 5);
+  state.profile.bestScore = Math.max(state.profile.bestScore, Math.round(session.score));
+  const completion = Math.round((session.score / currentScenario().targetScore) * 100);
+  state.profile.completionAverage = Math.round(((state.profile.completionAverage * Math.max(0, state.profile.sessions - 1)) + completion) / state.profile.sessions);
+  state.profile.unlockedRank = getCurrentRank();
+  saveProfile();
+  renderStats();
+  renderAirports();
+  pushToast(t('sessionComplete'));
+}
+
+function loop(ts) {
+  if (!state.lastFrame) state.lastFrame = ts;
+  const dt = Math.min(0.05, (ts - state.lastFrame) / 1000);
+  state.lastFrame = ts;
+  simulation.setLanguage(state.profile.language);
+  simulation.update(dt);
+  renderSession();
+  if (currentSession()?.completed && !state.sessionApplied) applySessionResult();
+  requestAnimationFrame(loop);
+}
+
+function wireEvents() {
+  refs.navButtons.forEach((button) => button.addEventListener('click', () => setScreen(button.dataset.screen)));
+  refs.startScenarioButton.addEventListener('click', startSession);
+  refs.openContentButton.addEventListener('click', () => setScreen('content'));
+  refs.sendCommandButton.addEventListener('click', sendCommand);
+  refs.commandInput.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') sendCommand();
+  });
+  refs.languageToggle.addEventListener('click', () => {
+    state.profile.language = state.profile.language === 'pt' ? 'en' : 'pt';
+    saveProfile();
+    applyTranslations();
+    renderBuildInfo();
+    renderAll();
+  });
+  refs.pauseButton.addEventListener('click', () => {
+    const session = currentSession();
+    if (!session) return;
+    session.running = !session.running;
+    refs.pauseButton.textContent = session.running ? t('pause') : (state.profile.language === 'pt' ? 'Continuar' : 'Resume');
+  });
+}
+
+function renderAll() {
+  applyTranslations();
+  renderStats();
+  renderAirports();
+  renderScenarios();
+  renderHero();
+  renderAirportBrief();
+  renderSession();
+}
+
+async function init() {
+  await loadData();
   await renderBuildInfo();
-  await refreshCatalog();
-  renderAlerts();
-  renderSelectedFlight();
-  loop();
-};
+  wireEvents();
+  renderAll();
+  requestAnimationFrame(loop);
+}
 
 init();

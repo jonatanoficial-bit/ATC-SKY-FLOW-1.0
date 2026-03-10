@@ -39,6 +39,7 @@ const refs = {
   sendCommandButton: document.getElementById('sendCommandButton'),
   buildChip: document.getElementById('buildChip'),
   completionChip: document.getElementById('completionChip'),
+  buildHud: document.getElementById('buildHud'),
   toastLayer: document.getElementById('toastLayer'),
   worldStage: document.getElementById('worldStage'),
   radarSvg: document.getElementById('radarSvg'),
@@ -308,6 +309,10 @@ function applyTranslations() {
   refs.commandInput.placeholder = state.profile.language === 'pt'
     ? 'APP / LAND / TAXI / TAKEOFF / ALT 5000 / HDG 270'
     : 'APP / LAND / TAXI / TAKEOFF / ALT 5000 / HDG 270';
+  if (state.buildInfo) {
+    refs.buildHud.textContent = `Build ${state.buildInfo.version} • ${state.buildInfo.buildLocal} • ${state.profile.language === 'pt' ? 'Conclusão' : 'Completion'} ${state.buildInfo.completion}`;
+    refs.completionChip.textContent = `${state.profile.language === 'pt' ? 'Conclusão' : 'Completion'}: ${state.buildInfo.completion}`;
+  }
 }
 
 async function loadData() {
@@ -327,9 +332,11 @@ async function renderBuildInfo() {
     state.buildInfo = info;
     refs.buildChip.textContent = `Build ${info.version} • ${info.buildLocal}`;
     refs.completionChip.textContent = `${state.profile.language === 'pt' ? 'Conclusão' : 'Completion'}: ${info.completion}`;
+    refs.buildHud.textContent = `Build ${info.version} • ${info.buildLocal} • ${state.profile.language === 'pt' ? 'Conclusão' : 'Completion'} ${info.completion}`;
   } catch {
     refs.buildChip.textContent = 'Build local';
     refs.completionChip.textContent = '--';
+    refs.buildHud.textContent = 'Build local';
   }
 }
 

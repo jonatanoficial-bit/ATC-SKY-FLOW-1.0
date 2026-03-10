@@ -1031,3 +1031,34 @@ button {
   margin-top: 1.6rem;
 }
 .marker-layer { overflow: visible; }
+
+
+.build-hud {
+  position: fixed;
+  right: max(0.8rem, env(safe-area-inset-right));
+  bottom: calc(5.9rem + env(safe-area-inset-bottom));
+  z-index: 24;
+  padding: 0.65rem 0.85rem;
+  border-radius: 0.95rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.72rem;
+  color: #d8ebff;
+  letter-spacing: 0.04em;
+  box-shadow: 0 14px 30px rgba(0,0,0,0.28);
+}
+
+.svg-aircraft-marker text {
+  user-select: none;
+  pointer-events: none;
+}
+
+.svg-aircraft-marker.selected rect {
+  stroke: rgba(112, 192, 255, 0.95);
+  stroke-width: 1.8;
+}
+
+@media (min-width: 900px) {
+  .build-hud {
+    bottom: 1rem;
+  }
+}

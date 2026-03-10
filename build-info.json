@@ -1,10 +1,10 @@
 {
-  "version": "2.1.1",
-  "buildLocal": "10/03/2026 18:35:00",
+  "version": "2.2.0",
+  "buildLocal": "10/03/2026 19:12:00",
   "completion": "99%",
   "notes": [
-    "radar firefox compatibility fix",
-    "aircraft markers restored",
-    "service worker cache reset"
+    "build hud visible inside game",
+    "svg aircraft rendering rewritten for broader browser compatibility",
+    "service worker neutralized to avoid stale deploys"
   ]
 }

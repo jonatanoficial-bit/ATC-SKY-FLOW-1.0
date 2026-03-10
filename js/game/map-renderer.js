@@ -10,7 +10,8 @@ const svg = (tag, attrs = {}) => {
 
 const polarToCanvas = (bearing, distanceNm, radiusNm, size = 1000) => {
   const usable = size * 0.39;
-  const r = (distanceNm / radiusNm) * usable;
+  const clampedDistance = Math.max(0, Math.min(radiusNm, distanceNm));
+  const r = (clampedDistance / radiusNm) * usable;
   const rad = ((bearing - 90) * Math.PI) / 180;
   return {
     x: size / 2 + Math.cos(rad) * r,
@@ -33,6 +34,8 @@ const lineFromHeading = (cx, cy, heading, length, lateral = 0) => {
   };
 };
 
+const aircraftPath = 'M0,-20 L4,-8 L16,-6 L16,-1 L5,1 L2,16 L8,20 L8,24 L0,20 L-8,24 L-8,20 L-2,16 L-5,1 L-16,-1 L-16,-6 L-4,-8 Z';
+
 export class MapRenderer {
   constructor({ stage, radarSvg, markerLayer, onSelectFlight }) {
     this.stage = stage;
@@ -48,6 +51,7 @@ export class MapRenderer {
   ensureRadarShell() {
     this.radarSvg.innerHTML = '';
     this.radarSvg.setAttribute('viewBox', '0 0 1000 1000');
+    this.radarSvg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
 
     const defs = svg('defs');
     const radarGlow = svg('radialGradient', { id: 'radarGlowCore', cx: '50%', cy: '50%', r: '50%' });
@@ -61,6 +65,17 @@ export class MapRenderer {
     sweep.appendChild(svg('stop', { offset: '72%', 'stop-color': '#7fffd4', 'stop-opacity': '0.04' }));
     sweep.appendChild(svg('stop', { offset: '100%', 'stop-color': '#7fffd4', 'stop-opacity': '0.24' }));
     defs.appendChild(sweep);
+
+    const aircraftGradient = svg('linearGradient', { id: 'planeMetalGradient', x1: '0%', y1: '0%', x2: '100%', y2: '100%' });
+    aircraftGradient.appendChild(svg('stop', { offset: '0%', 'stop-color': '#f7fbff' }));
+    aircraftGradient.appendChild(svg('stop', { offset: '48%', 'stop-color': '#c2d3e6' }));
+    aircraftGradient.appendChild(svg('stop', { offset: '100%', 'stop-color': '#7287a2' }));
+    defs.appendChild(aircraftGradient);
+
+    const glow = svg('filter', { id: 'blipGlow', x: '-80%', y: '-80%', width: '260%', height: '260%' });
+    glow.appendChild(svg('feGaussianBlur', { stdDeviation: '4' }));
+    defs.appendChild(glow);
+
     this.radarSvg.appendChild(defs);
 
     this.backgroundGroup = svg('g');
@@ -69,7 +84,8 @@ export class MapRenderer {
     this.fixGroup = svg('g');
     this.sweepGroup = svg('g', { class: 'sweep' });
     this.trailGroup = svg('g');
-    this.radarSvg.append(this.backgroundGroup, this.routeGroup, this.runwayGroup, this.fixGroup, this.sweepGroup, this.trailGroup);
+    this.flightGroup = svg('g');
+    this.radarSvg.append(this.backgroundGroup, this.routeGroup, this.runwayGroup, this.fixGroup, this.sweepGroup, this.trailGroup, this.flightGroup);
   }
 
   setAirport(airport) {
@@ -129,7 +145,7 @@ export class MapRenderer {
       'stroke-dasharray': '16 12'
     }));
 
-    airport.fixes.forEach((fix) => {
+    (airport.fixes || []).forEach((fix) => {
       const p = polarToCanvas(fix.bearing, fix.distanceNm, airport.tmaRadiusNm, this.size);
       this.fixGroup.appendChild(svg('circle', {
         cx: p.x,
@@ -159,7 +175,7 @@ export class MapRenderer {
       }));
     });
 
-    airport.runways.forEach((runway, index) => {
+    (airport.runways || []).forEach((runway, index) => {
       const line = lineFromHeading(center, center, runway.oppositeHeading, 104 + (index * 8), index === 0 ? -12 : 12);
       this.runwayGroup.appendChild(svg('line', {
         ...line,
@@ -203,8 +219,9 @@ export class MapRenderer {
   render(airport, flights) {
     if (!airport) return;
     this.setAirport(airport);
-    this.markerLayer.innerHTML = '';
+    this.flightGroup.innerHTML = '';
     this.trailGroup.innerHTML = '';
+    if (this.markerLayer) this.markerLayer.innerHTML = '';
 
     flights.forEach((flight) => {
       (flight.trail || []).forEach((point, index) => {
@@ -219,33 +236,59 @@ export class MapRenderer {
       });
 
       const point = polarToCanvas(flight.bearing, flight.distanceNm, airport.tmaRadiusNm, this.size);
-      const marker = document.createElement('button');
-      marker.type = 'button';
-      marker.className = `aircraft-marker ${flight.colorState || 'stable'} ${this.selectedFlightId === flight.id ? 'selected' : ''}`;
-      marker.style.left = `${(point.x / this.size) * 100}%`;
-      marker.style.top = `${(point.y / this.size) * 100}%`;
-      marker.innerHTML = `
-        <span class="aircraft-blip"></span>
-        <span class="aircraft-model" style="transform: translate(-50%, -50%) rotate(${flight.heading}deg);">
-          <svg viewBox="0 0 64 64" aria-hidden="true">
-            <defs>
-              <linearGradient id="planeMetalGradient" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stop-color="#f7fbff"></stop>
-                <stop offset="48%" stop-color="#c2d3e6"></stop>
-                <stop offset="100%" stop-color="#7287a2"></stop>
-              </linearGradient>
-            </defs>
-            <path fill="url(#planeMetalGradient)" d="M31 4h2c2 0 4 2 4 4l2 11 14 7v4l-14 2-3 10 9 8v4l-12-3-2 9h-2l-2-9-12 3v-4l9-8-3-10-14-2v-4l14-7 2-11c0-2 2-4 4-4z"></path>
-          </svg>
-        </span>
-        <span class="aircraft-tag">
-          <strong>${flight.callsign}</strong>
-          <small>${flight.model} · ${Math.round(flight.altitudeFt)}ft · ${Math.round(flight.speedKt)}kt</small>
-          <small>${flight.status}</small>
-        </span>
-      `;
-      marker.addEventListener('click', () => this.onSelectFlight?.(flight.id));
-      this.markerLayer.appendChild(marker);
+      const group = svg('g', {
+        class: `svg-aircraft-marker ${flight.colorState || 'stable'} ${this.selectedFlightId === flight.id ? 'selected' : ''}`,
+        transform: `translate(${point.x} ${point.y})`,
+        tabindex: '0',
+        role: 'button',
+        'aria-label': `${flight.callsign} ${flight.model}`
+      });
+      group.style.cursor = 'pointer';
+
+      const glowColor = flight.colorState === 'conflict' ? '#ff7373' : flight.colorState === 'warning' ? '#f6c64b' : '#61f2b0';
+      group.appendChild(svg('circle', { cx: 0, cy: 0, r: 10, fill: glowColor, 'fill-opacity': '0.16', filter: 'url(#blipGlow)' }));
+      group.appendChild(svg('circle', { cx: 0, cy: 0, r: 5.5, fill: '#f9fcff', 'fill-opacity': '0.95' }));
+      group.appendChild(svg('path', {
+        d: aircraftPath,
+        fill: 'url(#planeMetalGradient)',
+        transform: `rotate(${flight.heading}) scale(0.9)`
+      }));
+
+      const labelX = point.x > this.size * 0.68 ? -190 : 22;
+      const labelY = -22;
+      const label = svg('g', { transform: `translate(${labelX} ${labelY})` });
+      label.appendChild(svg('rect', {
+        x: 0,
+        y: 0,
+        width: 172,
+        height: 52,
+        rx: 10,
+        fill: '#050c13',
+        'fill-opacity': '0.88',
+        stroke: flight.colorState === 'conflict' ? '#ff6d6d' : flight.colorState === 'warning' ? '#ffca57' : '#75e5c3',
+        'stroke-opacity': flight.colorState === 'conflict' ? '0.7' : flight.colorState === 'warning' ? '0.7' : '0.42',
+        'stroke-width': 1.3
+      }));
+      const line1 = svg('text', { x: 10, y: 18, fill: '#f0f7ff', 'font-size': 12, 'font-family': 'ui-monospace, monospace', 'font-weight': '700' });
+      line1.textContent = `${flight.callsign} · ${flight.model}`;
+      const line2 = svg('text', { x: 10, y: 33, fill: '#98afc9', 'font-size': 11, 'font-family': 'ui-monospace, monospace' });
+      line2.textContent = `${Math.round(flight.altitudeFt)}ft · ${Math.round(flight.speedKt)}kt · ${Math.round(flight.heading).toString().padStart(3, '0')}`;
+      const line3 = svg('text', { x: 10, y: 46, fill: '#98afc9', 'font-size': 10.5, 'font-family': 'ui-monospace, monospace' });
+      line3.textContent = `${flight.status}`;
+      label.append(line1, line2, line3);
+      group.appendChild(label);
+
+      const hit = svg('circle', { cx: 0, cy: 0, r: 30, fill: 'transparent' });
+      group.appendChild(hit);
+      const select = () => this.onSelectFlight?.(flight.id);
+      group.addEventListener('click', select);
+      group.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          select();
+        }
+      });
+      this.flightGroup.appendChild(group);
     });
   }
 }

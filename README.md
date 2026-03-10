@@ -80,3 +80,8 @@ build-info.json      versão, data/hora e progresso da build
 - Os aeroportos, frequências, pistas, fixes e lógica operacional foram simplificados para manter a jogabilidade.
 - A base foi desenhada para futura expansão com STAR/SID mais detalhadas, vento, ocupação de pista, separação por wake turbulence e integração com backend.
 - O Admin atual continua local/static-first e pronto para evoluir.
+
+
+## Build visível no jogo
+
+A versão e a data/hora da build aparecem dentro da interface. Se publicar uma atualização, faça reload forçado para garantir que a build mais recente foi carregada.

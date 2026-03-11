@@ -1,11 +1,11 @@
 {
-  "version": "2.3.0",
-  "buildLocal": "11/03/2026 20:59:59",
-  "completion": "99%",
+  "version": "2.3.1",
+  "buildDate": "2026-03-11",
+  "buildTime": "22:55:00",
+  "progress": "99%",
   "notes": [
-    "radar layering rebuilt",
-    "mobile ATC command pad",
-    "slower radio cadence",
-    "ADS-B ready traffic profiles"
+    "ATC buttons now auto-open with selected flight",
+    "radio cadence slowed down and queue spacing increased",
+    "simulation pace reduced for more realistic tolerance"
   ]
 }

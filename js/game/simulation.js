@@ -75,7 +75,7 @@ export class SimulationEngine {
       completed: false
     };
     this.emitSystem('session_start', this.t('sessionStart', { airport: airport.iata }));
-    for (let i = 0; i < 3; i += 1) this.spawnFlight(i % 2 === 0 ? 'arrival' : 'departure');
+    for (let i = 0; i < 2; i += 1) this.spawnFlight(i % 2 === 0 ? 'arrival' : 'departure');
     return this.session;
   }
 
@@ -93,7 +93,7 @@ export class SimulationEngine {
     s.elapsed += dt;
     this.spawnClock += dt;
 
-    if (this.spawnClock >= s.scenario.spawnInterval && s.flights.length < s.scenario.maxActive) {
+    if (this.spawnClock >= (s.scenario.spawnInterval * 1.8) && s.flights.length < Math.max(3, s.scenario.maxActive - 1)) {
       this.spawnClock = 0;
       this.spawnFlight(Math.random() > 0.45 ? 'arrival' : 'departure');
     }
@@ -349,7 +349,7 @@ export class SimulationEngine {
 
     if (!flight.clearedApproach && flight.distanceNm < 18) {
       flight.colorState = 'warning';
-      if (flight.phaseClock > 70) {
+      if (flight.phaseClock > 150) {
         this.punish(26, this.t('warnApproachLate', { callsign: flight.callsign }));
         flight.phaseClock = 0;
       }
@@ -381,7 +381,7 @@ export class SimulationEngine {
       this.emitRadio('pilot', this.t('pilotGoAround', { callsign: flight.callsign }), flight);
     }
 
-    if (flight.phase === 'landing-roll' && flight.phaseClock > 4) {
+    if (flight.phase === 'landing-roll' && flight.phaseClock > 9) {
       flight.completed = true;
       flight.status = 'LANDED';
       this.emitSystem('landed', this.t('eventLanded', { callsign: flight.callsign }));
@@ -391,7 +391,7 @@ export class SimulationEngine {
   stepDeparture(flight, dt, airport) {
     if (flight.phase === 'request-taxi') {
       flight.status = 'GND';
-      if (flight.phaseClock > 75) {
+      if (flight.phaseClock > 150) {
         this.punish(18, this.t('warnTaxiDelay', { callsign: flight.callsign }));
         flight.phaseClock = 0;
       }
@@ -400,7 +400,7 @@ export class SimulationEngine {
 
     if (flight.phase === 'taxi') {
       flight.status = 'TAXI';
-      if (flight.phaseClock > 18) {
+      if (flight.phaseClock > 38) {
         flight.phase = 'ready-departure';
         flight.phaseClock = 0;
         this.emitRadio('pilot', this.t('pilotReadyDeparture', { callsign: flight.callsign, runway: airport.preferredConfig.departureRunway }), flight);
@@ -410,7 +410,7 @@ export class SimulationEngine {
 
     if (flight.phase === 'ready-departure') {
       flight.status = 'LINE UP';
-      if (flight.phaseClock > 65) {
+      if (flight.phaseClock > 130) {
         this.punish(18, this.t('warnTakeoffDelay', { callsign: flight.callsign }));
         flight.phaseClock = 0;
       }
@@ -420,7 +420,7 @@ export class SimulationEngine {
     if (flight.phase === 'departure-roll') {
       flight.status = 'ROLL';
       flight.speedKt = Math.min(165, flight.speedKt + 26 * dt);
-      if (flight.phaseClock > 5) {
+      if (flight.phaseClock > 11) {
         flight.phase = 'departure-climb';
         flight.phaseClock = 0;
         this.emitRadio('pilot', this.t('pilotAirborne', { callsign: flight.callsign, fix: flight.fix.name }), flight);
@@ -437,7 +437,7 @@ export class SimulationEngine {
       flight.bearing = normalizeHeading(flight.heading);
       flight.distanceNm += (flight.speedKt / 3600) * dt;
 
-      if (flight.altitudeFt >= 4500 && !flight.handoffPrompted) {
+      if (flight.altitudeFt >= 6500 && !flight.handoffPrompted) {
         flight.handoffPrompted = true;
         this.emitRadio('pilot', this.t('pilotLeavingAirspace', { callsign: flight.callsign }), flight);
       }

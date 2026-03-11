@@ -444,6 +444,9 @@ function renderSession() {
   refs.hudCalm.textContent = `${Math.round(session?.calm || 100)}%`;
   refs.hudLandings.textContent = session?.landings || 0;
   refs.hudHandoffs.textContent = session?.handoffs || 0;
+  if ((!state.selectedFlightId || !(session?.flights || []).some((flight) => flight.id === state.selectedFlightId)) && (session?.flights || []).length) {
+    state.selectedFlightId = session.flights[0].id;
+  }
   renderFlightStrips();
   renderFlightSelection();
 }
@@ -462,12 +465,15 @@ function renderFlightStrips() {
     </button>
   `).join('');
   refs.flightStripList.querySelectorAll('[data-flight-id]').forEach((button) => {
-    button.addEventListener('click', () => {
+    const selectFlight = () => {
       state.selectedFlightId = button.dataset.flightId;
       renderer.selectFlight(state.selectedFlightId);
       renderFlightSelection();
       renderFlightStrips();
-    });
+    };
+    button.addEventListener('click', selectFlight);
+    button.addEventListener('pointerdown', selectFlight);
+    button.addEventListener('touchstart', selectFlight, { passive: true });
   });
 }
 
@@ -583,14 +589,15 @@ function processTypewriterQueue() {
   refs.radioLog.prepend(line);
   const text = next.message;
   let index = 0;
-  const charDelay = next.side === 'pilot' ? 34 : next.side === 'atc' ? 24 : 18;
+  const charDelay = next.side === 'pilot' ? 52 : next.side === 'atc' ? 44 : 28;
   const timer = setInterval(() => {
     body.textContent += text[index] || '';
     index += 1;
     if (index >= text.length) {
       clearInterval(timer);
       refs.radioLog.scrollTop = 0;
-      setTimeout(processTypewriterQueue, next.side === 'system' ? 320 : 1100 + Math.min(900, text.length * 12));
+      const pause = next.side === 'system' ? 900 : 2200 + Math.min(2200, text.length * 22);
+      setTimeout(processTypewriterQueue, pause);
     }
   }, charDelay);
 }
@@ -645,7 +652,7 @@ function applySessionResult() {
 
 function loop(ts) {
   if (!state.lastFrame) state.lastFrame = ts;
-  const dt = Math.min(0.05, (ts - state.lastFrame) / 1000) * 0.58;
+  const dt = Math.min(0.04, (ts - state.lastFrame) / 1000) * 0.28;
   state.lastFrame = ts;
   simulation.setLanguage(state.profile.language);
   simulation.update(dt);

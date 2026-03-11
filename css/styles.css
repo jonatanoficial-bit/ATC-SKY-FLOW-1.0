@@ -1062,3 +1062,36 @@ button {
     bottom: 1rem;
   }
 }
+
+
+[hidden] { display:none !important; }
+.radar-stage { background: radial-gradient(circle at center, rgba(8,28,36,0.98) 0%, rgba(4,13,20,0.98) 58%, rgba(2,8,13,1) 100%); }
+.radar-stage::after { background: radial-gradient(circle at center, rgba(0,0,0,0.02) 42%, rgba(0,0,0,0.08) 74%, rgba(0,0,0,0.18) 100%); }
+.radar-svg { z-index: 1; opacity: 1; }
+.marker-layer { z-index: 5; pointer-events: none; }
+.marker-layer .aircraft-marker { pointer-events: auto; }
+.atc-radar-stage { min-height: min(84vw, 44rem); box-shadow: inset 0 0 0 1px rgba(127,255,212,0.08), 0 18px 50px rgba(0,0,0,0.35); }
+.sweep-beam { inset: 4%; opacity: 0.75; }
+.compact-legend { top: 1rem; bottom: auto; justify-content: flex-start; gap: 1rem; right: auto; }
+.radar-sidepanel { position: relative; z-index: 6; }
+.radio-log { max-height: 18rem; }
+.quick-command-grid { grid-template-columns: repeat(3, minmax(0,1fr)); }
+.command-button { min-height: 3.4rem; font-weight: 700; background: linear-gradient(180deg, rgba(14,29,42,0.96), rgba(8,18,28,0.92)); }
+.command-button.primary { background: linear-gradient(135deg, rgba(27,122,255,0.95), rgba(56,210,168,0.88)); }
+.command-button.alert { background: linear-gradient(135deg, rgba(194,131,15,0.92), rgba(125,66,11,0.92)); }
+.command-pad-wrap { display:grid; gap:0.9rem; }
+.command-pad-head { align-items:center; }
+.command-groups { display:grid; gap:0.85rem; }
+.command-group { display:grid; gap:0.65rem; }
+.command-group h4 { margin:0; font-size:0.82rem; color:#9ac1ee; letter-spacing:0.16em; text-transform:uppercase; }
+.command-grid-mobile { display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap:0.65rem; }
+.command-button.dual { min-height: 4rem; }
+.command-button .mini { display:block; font-size:0.74rem; color:#cfe7ff; opacity:0.8; margin-top:0.14rem; }
+.build-hud { z-index: 50; }
+@media (max-width: 719px) {
+  .radar-layout { gap:0.85rem; }
+  .compact-legend { left:0.8rem; top:0.8rem; right:0.8rem; font-size:0.82rem; }
+  .radar-sidepanel { order:2; }
+  .flight-strip-panel { order:3; }
+  .command-dock { order:4; }
+}

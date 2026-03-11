@@ -122,8 +122,8 @@ export class SimulationEngine {
     const text = rawCommand.trim();
     const upper = text.toUpperCase();
     let handled = false;
-
-    const say = (message, type = 'atc') => this.emitRadio(type, message, flight);
+    let atcMessage = '';
+    let readback = '';
 
     const altitudeMatch = upper.match(/(?:ALT|CLIMB|DESCEND)\s*(\d{3,5})/);
     const headingMatch = upper.match(/(?:HDG|HEADING|TURN)\s*(\d{2,3})/);
@@ -132,19 +132,22 @@ export class SimulationEngine {
     if (altitudeMatch) {
       flight.targetAltitudeFt = clamp(roundStep(Number(altitudeMatch[1]), 500), 2000, 18000);
       handled = true;
-      say(this.t('atcAltitude', { callsign: flight.callsign, altitude: flight.targetAltitudeFt }));
+      atcMessage = this.t('atcAltitude', { callsign: flight.callsign, altitude: flight.targetAltitudeFt });
+      readback = this.t('pilotReadbackAltitude', { callsign: flight.callsign, altitude: flight.targetAltitudeFt });
       this.bumpScore(16);
     }
     if (headingMatch) {
       flight.targetHeading = normalizeHeading(Number(headingMatch[1]));
       handled = true;
-      say(this.t('atcHeading', { callsign: flight.callsign, heading: String(flight.targetHeading).padStart(3, '0') }));
+      atcMessage = this.t('atcHeading', { callsign: flight.callsign, heading: String(flight.targetHeading).padStart(3, '0') });
+      readback = this.t('pilotReadbackHeading', { callsign: flight.callsign, heading: String(flight.targetHeading).padStart(3, '0') });
       this.bumpScore(14);
     }
     if (speedMatch) {
       flight.targetSpeedKt = clamp(Number(speedMatch[1]), 140, 290);
       handled = true;
-      say(this.t('atcSpeed', { callsign: flight.callsign, speed: flight.targetSpeedKt }));
+      atcMessage = this.t('atcSpeed', { callsign: flight.callsign, speed: flight.targetSpeedKt });
+      readback = this.t('pilotReadbackSpeed', { callsign: flight.callsign, speed: flight.targetSpeedKt });
       this.bumpScore(12);
     }
 
@@ -153,14 +156,16 @@ export class SimulationEngine {
       flight.targetHeading = this.session.airport.preferredConfig.finalBearing;
       flight.targetAltitudeFt = Math.min(flight.targetAltitudeFt, 4000);
       handled = true;
-      say(this.t('atcApproach', { callsign: flight.callsign, runway: this.session.airport.preferredConfig.arrivalRunway }));
+      atcMessage = this.t('atcApproach', { callsign: flight.callsign, runway: this.session.airport.preferredConfig.arrivalRunway });
+      readback = this.t('pilotReadbackApproach', { callsign: flight.callsign, runway: this.session.airport.preferredConfig.arrivalRunway });
       this.bumpScore(24);
     }
 
     if (upper.includes('LAND')) {
       flight.clearedLand = true;
       handled = true;
-      say(this.t('atcLand', { callsign: flight.callsign, runway: this.session.airport.preferredConfig.arrivalRunway }));
+      atcMessage = this.t('atcLand', { callsign: flight.callsign, runway: this.session.airport.preferredConfig.arrivalRunway });
+      readback = this.t('pilotReadbackLand', { callsign: flight.callsign, runway: this.session.airport.preferredConfig.arrivalRunway });
       this.bumpScore(28);
     }
 
@@ -169,7 +174,8 @@ export class SimulationEngine {
         flight.phase = 'taxi';
         flight.phaseClock = 0;
         handled = true;
-        say(this.t('atcTaxi', { callsign: flight.callsign, runway: this.session.airport.preferredConfig.departureRunway }));
+        atcMessage = this.t('atcTaxi', { callsign: flight.callsign, runway: this.session.airport.preferredConfig.departureRunway });
+        readback = this.t('pilotReadbackTaxi', { callsign: flight.callsign, runway: this.session.airport.preferredConfig.departureRunway, fix: flight.fix.name });
         this.bumpScore(14);
       }
     }
@@ -181,7 +187,8 @@ export class SimulationEngine {
         flight.targetHeading = this.session.airport.preferredConfig.finalBearing;
         flight.targetAltitudeFt = 5000;
         handled = true;
-        say(this.t('atcTakeoff', { callsign: flight.callsign, runway: this.session.airport.preferredConfig.departureRunway }));
+        atcMessage = this.t('atcTakeoff', { callsign: flight.callsign, runway: this.session.airport.preferredConfig.departureRunway });
+        readback = this.t('pilotReadbackTakeoff', { callsign: flight.callsign, runway: this.session.airport.preferredConfig.departureRunway });
         this.bumpScore(26);
       }
     }
@@ -189,7 +196,8 @@ export class SimulationEngine {
     if (upper.includes('HANDOFF') || upper.includes('CONTACT CENTER') || upper.includes('CONTACT DEPARTURE')) {
       flight.handoffApproved = true;
       handled = true;
-      say(this.t('atcHandoff', { callsign: flight.callsign }));
+      atcMessage = this.t('atcHandoff', { callsign: flight.callsign });
+      readback = this.t('pilotReadbackHandoff', { callsign: flight.callsign });
       this.bumpScore(18);
     }
 
@@ -197,7 +205,8 @@ export class SimulationEngine {
       flight.holding = true;
       flight.targetSpeedKt = Math.max(180, flight.targetSpeedKt - 20);
       handled = true;
-      say(this.t('atcHold', { callsign: flight.callsign, fix: flight.fix.name }));
+      atcMessage = this.t('atcHold', { callsign: flight.callsign, fix: flight.fix.name });
+      readback = this.t('pilotReadbackHold', { callsign: flight.callsign, fix: flight.fix.name });
       this.bumpScore(10);
     }
 
@@ -207,7 +216,7 @@ export class SimulationEngine {
     }
 
     flight.lastControllerMessage = text;
-    return { ok: true, message: this.t('commandSent') };
+    return { ok: true, message: this.t('commandSent'), atcMessage, readback };
   }
 
   bumpScore(points) {
@@ -340,7 +349,7 @@ export class SimulationEngine {
 
     if (!flight.clearedApproach && flight.distanceNm < 18) {
       flight.colorState = 'warning';
-      if (flight.phaseClock > 28) {
+      if (flight.phaseClock > 70) {
         this.punish(26, this.t('warnApproachLate', { callsign: flight.callsign }));
         flight.phaseClock = 0;
       }
@@ -382,7 +391,7 @@ export class SimulationEngine {
   stepDeparture(flight, dt, airport) {
     if (flight.phase === 'request-taxi') {
       flight.status = 'GND';
-      if (flight.phaseClock > 26) {
+      if (flight.phaseClock > 75) {
         this.punish(18, this.t('warnTaxiDelay', { callsign: flight.callsign }));
         flight.phaseClock = 0;
       }
@@ -391,7 +400,7 @@ export class SimulationEngine {
 
     if (flight.phase === 'taxi') {
       flight.status = 'TAXI';
-      if (flight.phaseClock > 8) {
+      if (flight.phaseClock > 18) {
         flight.phase = 'ready-departure';
         flight.phaseClock = 0;
         this.emitRadio('pilot', this.t('pilotReadyDeparture', { callsign: flight.callsign, runway: airport.preferredConfig.departureRunway }), flight);
@@ -401,7 +410,7 @@ export class SimulationEngine {
 
     if (flight.phase === 'ready-departure') {
       flight.status = 'LINE UP';
-      if (flight.phaseClock > 28) {
+      if (flight.phaseClock > 65) {
         this.punish(18, this.t('warnTakeoffDelay', { callsign: flight.callsign }));
         flight.phaseClock = 0;
       }

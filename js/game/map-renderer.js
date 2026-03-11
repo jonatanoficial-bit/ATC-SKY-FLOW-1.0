@@ -246,39 +246,9 @@ export class MapRenderer {
       group.style.cursor = 'pointer';
 
       const glowColor = flight.colorState === 'conflict' ? '#ff7373' : flight.colorState === 'warning' ? '#f6c64b' : '#61f2b0';
-      group.appendChild(svg('circle', { cx: 0, cy: 0, r: 10, fill: glowColor, 'fill-opacity': '0.16', filter: 'url(#blipGlow)' }));
-      group.appendChild(svg('circle', { cx: 0, cy: 0, r: 5.5, fill: '#f9fcff', 'fill-opacity': '0.95' }));
-      group.appendChild(svg('path', {
-        d: aircraftPath,
-        fill: 'url(#planeMetalGradient)',
-        transform: `rotate(${flight.heading}) scale(0.9)`
-      }));
-
-      const labelX = point.x > this.size * 0.68 ? -190 : 22;
-      const labelY = -22;
-      const label = svg('g', { transform: `translate(${labelX} ${labelY})` });
-      label.appendChild(svg('rect', {
-        x: 0,
-        y: 0,
-        width: 172,
-        height: 52,
-        rx: 10,
-        fill: '#050c13',
-        'fill-opacity': '0.88',
-        stroke: flight.colorState === 'conflict' ? '#ff6d6d' : flight.colorState === 'warning' ? '#ffca57' : '#75e5c3',
-        'stroke-opacity': flight.colorState === 'conflict' ? '0.7' : flight.colorState === 'warning' ? '0.7' : '0.42',
-        'stroke-width': 1.3
-      }));
-      const line1 = svg('text', { x: 10, y: 18, fill: '#f0f7ff', 'font-size': 12, 'font-family': 'ui-monospace, monospace', 'font-weight': '700' });
-      line1.textContent = `${flight.callsign} · ${flight.model}`;
-      const line2 = svg('text', { x: 10, y: 33, fill: '#98afc9', 'font-size': 11, 'font-family': 'ui-monospace, monospace' });
-      line2.textContent = `${Math.round(flight.altitudeFt)}ft · ${Math.round(flight.speedKt)}kt · ${Math.round(flight.heading).toString().padStart(3, '0')}`;
-      const line3 = svg('text', { x: 10, y: 46, fill: '#98afc9', 'font-size': 10.5, 'font-family': 'ui-monospace, monospace' });
-      line3.textContent = `${flight.status}`;
-      label.append(line1, line2, line3);
-      group.appendChild(label);
-
-      const hit = svg('circle', { cx: 0, cy: 0, r: 30, fill: 'transparent' });
+      group.appendChild(svg('circle', { cx: 0, cy: 0, r: 12, fill: glowColor, 'fill-opacity': '0.22', filter: 'url(#blipGlow)' }));
+      group.appendChild(svg('circle', { cx: 0, cy: 0, r: 4.8, fill: '#f9fcff', 'fill-opacity': '0.98' }));
+      const hit = svg('circle', { cx: 0, cy: 0, r: 28, fill: 'transparent' });
       group.appendChild(hit);
       const select = () => this.onSelectFlight?.(flight.id);
       group.addEventListener('click', select);
@@ -289,6 +259,27 @@ export class MapRenderer {
         }
       });
       this.flightGroup.appendChild(group);
+
+      if (this.markerLayer) {
+        const marker = document.createElement('button');
+        marker.type = 'button';
+        marker.className = `aircraft-marker ${flight.colorState || 'stable'} ${this.selectedFlightId === flight.id ? 'selected' : ''}`;
+        marker.style.left = `${(point.x / this.size) * 100}%`;
+        marker.style.top = `${(point.y / this.size) * 100}%`;
+        marker.setAttribute('aria-label', `${flight.callsign} ${flight.model}`);
+        marker.innerHTML = `
+          <span class="aircraft-model" style="transform: rotate(${Math.round(flight.heading)}deg)">
+            <svg viewBox="-18 -18 36 36" aria-hidden="true">
+              <path d="${aircraftPath}" fill="url(#planeMetalGradient)"></path>
+            </svg>
+          </span>
+          <span class="aircraft-tag">
+            <strong>${flight.callsign} · ${flight.model}</strong>
+            <small>${Math.round(flight.altitudeFt)}ft · ${Math.round(flight.speedKt)}kt · ${String(Math.round(flight.heading)).padStart(3, '0')}</small>
+          </span>`;
+        marker.addEventListener('click', select);
+        this.markerLayer.appendChild(marker);
+      }
     });
   }
 }

@@ -1,10 +1,11 @@
 {
-  "version": "2.2.0",
-  "buildLocal": "10/03/2026 19:12:00",
+  "version": "2.3.0",
+  "buildLocal": "11/03/2026 20:59:59",
   "completion": "99%",
   "notes": [
-    "build hud visible inside game",
-    "svg aircraft rendering rewritten for broader browser compatibility",
-    "service worker neutralized to avoid stale deploys"
+    "radar layering rebuilt",
+    "mobile ATC command pad",
+    "slower radio cadence",
+    "ADS-B ready traffic profiles"
   ]
 }

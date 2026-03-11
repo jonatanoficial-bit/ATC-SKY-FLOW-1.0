@@ -178,13 +178,16 @@
 
               <div class="quick-command-grid" id="quickCommandGrid"></div>
 
-              <label class="command-input-wrap">
-                <span class="eyebrow" data-i18n="atcTypewriter">Comando ATC estilo máquina de escrever</span>
-                <div class="command-input-row">
-                  <input id="commandInput" type="text" placeholder="APP / LAND / TAXI / TAKEOFF / ALT 5000 / HDG 270" autocomplete="off" />
-                  <button class="primary-button compact-button" id="sendCommandButton" type="button" data-i18n="transmit">Transmitir</button>
+              <section class="command-pad-wrap">
+                <div class="section-head compact command-pad-head">
+                  <div>
+                    <p class="eyebrow" data-i18n="mobileAtcPad">Painel ATC mobile-first</p>
+                    <h3 data-i18n="tapCommands">Comandos por toque</h3>
+                  </div>
+                  <span class="tiny-pill" id="commandPadHint">ATC PAD</span>
                 </div>
-              </label>
+                <div class="command-groups" id="commandGroups"></div>
+              </section>
             </section>
           </div>
         </section>

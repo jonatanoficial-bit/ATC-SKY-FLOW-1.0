@@ -35,8 +35,8 @@ const refs = {
   selectedFlightTag: document.getElementById('selectedFlightTag'),
   selectedFlightCard: document.getElementById('selectedFlightCard'),
   quickCommandGrid: document.getElementById('quickCommandGrid'),
-  commandInput: document.getElementById('commandInput'),
-  sendCommandButton: document.getElementById('sendCommandButton'),
+  commandGroups: document.getElementById('commandGroups'),
+  commandPadHint: document.getElementById('commandPadHint'),
   buildChip: document.getElementById('buildChip'),
   completionChip: document.getElementById('completionChip'),
   buildHud: document.getElementById('buildHud'),
@@ -82,8 +82,8 @@ const dictionary = {
     directControl: 'Controle direto',
     selectFlight: 'Selecione um voo',
     tapFlightHint: 'Toque em uma faixa ou contato radar para abrir comandos da aeronave.',
-    atcTypewriter: 'Comando ATC estilo máquina de escrever',
-    transmit: 'Transmitir',
+    mobileAtcPad: 'Painel ATC mobile-first',
+    tapCommands: 'Comandos por toque',
     dashboard: 'Dashboard',
     operation: 'Operação',
     content: 'Conteúdo',
@@ -142,8 +142,8 @@ const dictionary = {
     directControl: 'Direct control',
     selectFlight: 'Select a flight',
     tapFlightHint: 'Tap a strip or radar contact to open aircraft controls.',
-    atcTypewriter: 'ATC typewriter command',
-    transmit: 'Transmit',
+    mobileAtcPad: 'Mobile-first ATC pad',
+    tapCommands: 'Tap commands',
     dashboard: 'Dashboard',
     operation: 'Operation',
     content: 'Content',
@@ -306,9 +306,6 @@ function applyTranslations() {
     const key = element.dataset.i18n;
     element.textContent = t(key);
   });
-  refs.commandInput.placeholder = state.profile.language === 'pt'
-    ? 'APP / LAND / TAXI / TAKEOFF / ALT 5000 / HDG 270'
-    : 'APP / LAND / TAXI / TAKEOFF / ALT 5000 / HDG 270';
   if (state.buildInfo) {
     refs.buildHud.textContent = `Build ${state.buildInfo.version} • ${state.buildInfo.buildLocal} • ${state.profile.language === 'pt' ? 'Conclusão' : 'Completion'} ${state.buildInfo.completion}`;
     refs.completionChip.textContent = `${state.profile.language === 'pt' ? 'Conclusão' : 'Completion'}: ${state.buildInfo.completion}`;
@@ -476,12 +473,41 @@ function renderFlightStrips() {
 
 function quickCommandsForFlight(flight) {
   if (!flight) return [];
+  const groups = [];
   if (flight.kind === 'arrival') {
-    return ['ALT 5000', 'HDG 270', 'SPD 180', 'APP', 'LAND', 'HOLD'];
+    groups.push({ title: state.profile.language === 'pt' ? 'Altitude' : 'Altitude', buttons: [
+      { label: state.profile.language === 'pt' ? 'Descer 5000' : 'Descend 5000', command: 'ALT 5000', tone: 'primary' },
+      { label: state.profile.language === 'pt' ? 'Descer 3000' : 'Descend 3000', command: 'ALT 3000' },
+      { label: state.profile.language === 'pt' ? 'Manter 7000' : 'Maintain 7000', command: 'ALT 7000' }
+    ]});
+    groups.push({ title: state.profile.language === 'pt' ? 'Vetoração' : 'Vectoring', buttons: [
+      { label: state.profile.language === 'pt' ? 'Curva esquerda' : 'Turn left', command: `HDG ${String((Math.round(flight.heading) + 330) % 360).padStart(3,'0')}` },
+      { label: state.profile.language === 'pt' ? 'Rumo final' : 'Final heading', command: `HDG ${String(Math.round(currentAirport()?.preferredConfig?.finalBearing || flight.heading)).padStart(3,'0')}`, tone: 'primary' },
+      { label: state.profile.language === 'pt' ? 'Curva direita' : 'Turn right', command: `HDG ${String((Math.round(flight.heading) + 30) % 360).padStart(3,'0')}` }
+    ]});
+    groups.push({ title: state.profile.language === 'pt' ? 'Ação' : 'Actions', buttons: [
+      { label: 'APP', sub: state.profile.language === 'pt' ? 'Autorizar aproximação' : 'Clear approach', command: 'APP', tone: 'primary' },
+      { label: 'LAND', sub: state.profile.language === 'pt' ? 'Autorizar pouso' : 'Clear to land', command: 'LAND', tone: 'primary' },
+      { label: 'HOLD', sub: state.profile.language === 'pt' ? 'Entrar em espera' : 'Enter hold', command: 'HOLD', tone: 'alert' }
+    ]});
+  } else {
+    groups.push({ title: state.profile.language === 'pt' ? 'Solo' : 'Ground', buttons: [
+      { label: 'TAXI', sub: state.profile.language === 'pt' ? 'Táxi autorizado' : 'Taxi approved', command: 'TAXI', tone: 'primary' },
+      { label: 'HOLD', sub: state.profile.language === 'pt' ? 'Mantenha posição' : 'Hold position', command: 'HOLD' },
+      { label: state.profile.language === 'pt' ? 'Subir 5000' : 'Climb 5000', command: 'ALT 5000' }
+    ]});
+    groups.push({ title: state.profile.language === 'pt' ? 'Partida' : 'Departure', buttons: [
+      { label: 'TAKEOFF', sub: state.profile.language === 'pt' ? 'Autorizar decolagem' : 'Cleared takeoff', command: 'TAKEOFF', tone: 'primary' },
+      { label: state.profile.language === 'pt' ? 'Rumo saída' : 'SID heading', command: `HDG ${String(Math.round(currentAirport()?.preferredConfig?.finalBearing || flight.heading)).padStart(3,'0')}` },
+      { label: 'HANDOFF', sub: state.profile.language === 'pt' ? 'Transferir setor' : 'Transfer sector', command: 'HANDOFF', tone: 'alert' }
+    ]});
   }
-  if (flight.phase === 'request-taxi') return ['TAXI'];
-  if (flight.phase === 'ready-departure') return ['TAKEOFF', 'HDG 270', 'ALT 5000'];
-  return ['HDG 270', 'ALT 5000', 'SPD 220', 'HANDOFF'];
+  groups.push({ title: state.profile.language === 'pt' ? 'Velocidade' : 'Speed', buttons: [
+    { label: state.profile.language === 'pt' ? '180 nós' : '180 knots', command: 'SPD 180' },
+    { label: state.profile.language === 'pt' ? '210 nós' : '210 knots', command: 'SPD 210' },
+    { label: state.profile.language === 'pt' ? '230 nós' : '230 knots', command: 'SPD 230' }
+  ]});
+  return groups;
 }
 
 function renderFlightSelection() {
@@ -492,10 +518,13 @@ function renderFlightSelection() {
     refs.selectedFlightTag.textContent = '—';
     refs.selectedFlightCard.innerHTML = `<p>${t('tapFlightHint')}</p>`;
     refs.quickCommandGrid.innerHTML = '';
+    if (refs.commandGroups) refs.commandGroups.innerHTML = '';
+    if (refs.commandPadHint) refs.commandPadHint.textContent = 'ATC PAD';
     return;
   }
   refs.selectedFlightTitle.textContent = `${flight.callsign} · ${flight.model}`;
   refs.selectedFlightTag.textContent = `${flight.kind.toUpperCase()} · ${flight.status}`;
+  if (refs.commandPadHint) refs.commandPadHint.textContent = `${flight.callsign} · ${flight.phase}`;
   refs.selectedFlightCard.innerHTML = `
     <div class="flight-detail-grid">
       <div><span>ICAO</span><strong>${flight.model}</strong></div>
@@ -506,15 +535,26 @@ function renderFlightSelection() {
       <div><span>PHASE</span><strong>${flight.phase}</strong></div>
     </div>
   `;
-  refs.quickCommandGrid.innerHTML = quickCommandsForFlight(flight)
-    .map((command) => `<button class="command-button" type="button" data-quick-command="${command}">${command}</button>`)
+  const groups = quickCommandsForFlight(flight);
+  refs.quickCommandGrid.innerHTML = groups.flatMap((group) => group.buttons).slice(0, 6)
+    .map((item) => `<button class="command-button ${item.tone || ''}" type="button" data-quick-command="${item.command}">${item.label}${item.sub ? `<span class="mini">${item.sub}</span>` : ''}</button>`)
     .join('');
   refs.quickCommandGrid.querySelectorAll('[data-quick-command]').forEach((button) => {
-    button.addEventListener('click', () => {
-      refs.commandInput.value = button.dataset.quickCommand;
-      sendCommand();
-    });
+    button.addEventListener('click', () => sendCommand(button.dataset.quickCommand));
   });
+  if (refs.commandGroups) {
+    refs.commandGroups.innerHTML = groups.map((group) => `
+      <div class="command-group">
+        <h4>${group.title}</h4>
+        <div class="command-grid-mobile">
+          ${group.buttons.map((item) => `<button class="command-button dual ${item.tone || ''}" type="button" data-pad-command="${item.command}">${item.label}${item.sub ? `<span class="mini">${item.sub}</span>` : ''}</button>`).join('')}
+        </div>
+      </div>
+    `).join('');
+    refs.commandGroups.querySelectorAll('[data-pad-command]').forEach((button) => {
+      button.addEventListener('click', () => sendCommand(button.dataset.padCommand));
+    });
+  }
 }
 
 const typewriterQueue = [];
@@ -543,26 +583,28 @@ function processTypewriterQueue() {
   refs.radioLog.prepend(line);
   const text = next.message;
   let index = 0;
+  const charDelay = next.side === 'pilot' ? 34 : next.side === 'atc' ? 24 : 18;
   const timer = setInterval(() => {
     body.textContent += text[index] || '';
     index += 1;
     if (index >= text.length) {
       clearInterval(timer);
-      processTypewriterQueue();
+      refs.radioLog.scrollTop = 0;
+      setTimeout(processTypewriterQueue, next.side === 'system' ? 320 : 1100 + Math.min(900, text.length * 12));
     }
-  }, 10);
+  }, charDelay);
 }
 
-function sendCommand() {
+function sendCommand(commandText) {
   const flight = currentFlight();
   if (!flight) return;
-  const text = refs.commandInput.value.trim();
+  const text = (commandText || '').trim();
   if (!text) return;
   const result = simulation.issueCommand(flight.id, text);
   if (result.ok) {
-    appendRadioEntry({ side: 'atc', message: `${flight.callsign}, ${text}` });
+    appendRadioEntry({ side: 'atc', message: result.atcMessage || `${flight.callsign}, ${text}` });
+    if (result.readback) appendRadioEntry({ side: 'pilot', message: result.readback });
     pushToast(t('commandSentToast'));
-    refs.commandInput.value = '';
   } else {
     pushToast(result.message);
   }
@@ -603,7 +645,7 @@ function applySessionResult() {
 
 function loop(ts) {
   if (!state.lastFrame) state.lastFrame = ts;
-  const dt = Math.min(0.05, (ts - state.lastFrame) / 1000);
+  const dt = Math.min(0.05, (ts - state.lastFrame) / 1000) * 0.58;
   state.lastFrame = ts;
   simulation.setLanguage(state.profile.language);
   simulation.update(dt);
@@ -616,10 +658,6 @@ function wireEvents() {
   refs.navButtons.forEach((button) => button.addEventListener('click', () => setScreen(button.dataset.screen)));
   refs.startScenarioButton.addEventListener('click', startSession);
   refs.openContentButton.addEventListener('click', () => setScreen('content'));
-  refs.sendCommandButton.addEventListener('click', sendCommand);
-  refs.commandInput.addEventListener('keydown', (event) => {
-    if (event.key === 'Enter') sendCommand();
-  });
   refs.languageToggle.addEventListener('click', () => {
     state.profile.language = state.profile.language === 'pt' ? 'en' : 'pt';
     saveProfile();
